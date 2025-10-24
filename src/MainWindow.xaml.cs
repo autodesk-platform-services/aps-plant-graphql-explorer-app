@@ -22,7 +22,6 @@ namespace GraphQLClient
         public MainWindow()
         {
             InitializeComponent();
-            _tokenService = OAuthPasswordTokenService.CreateDefault(GraphQLEnvironment.Staging);
         }
 
         private LoginView LoginView => LoginViewControl;
@@ -46,15 +45,7 @@ namespace GraphQLClient
                 SetBusyState(true);
                 ShowStatus("Signing in…", Brushes.DodgerBlue);
 
-                var selectedEnvironment = GetSelectedEnvironment();
-                if (selectedEnvironment != _tokenService.Environment)
-                {
-                    _tokenService.Dispose();
-                    _tokenService = OAuthPasswordTokenService.CreateDefault(selectedEnvironment);
-                }
-
                 var result = await _tokenService.RequestTokenAsync(_loginCancellation.Token);
-
                 HandleTokenResult(result);
             }
             catch (OperationCanceledException)
@@ -96,7 +87,7 @@ namespace GraphQLClient
             //AppView.SearchClicked -= AppView_SearchClicked;
             //AppView.CopyTokenClicked -= CopyTokenButton_Click;
 
-            _tokenService.Dispose();
+            _tokenService?.Dispose();
 
             base.OnClosed(e);
         }
@@ -145,8 +136,9 @@ namespace GraphQLClient
             Content = _appView;
         }
 
-        private async void LoginView_LoginClicked(object? sender, RoutedEventArgs e)
+        private async void LoginView_LoginClicked(object? sender, LoginEventArgs e)
         {
+            _tokenService = OAuthPasswordTokenService.CreateDefault(e.Environment, e.OAuthType);
             await AttemptLoginAsync();
         }
 

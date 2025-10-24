@@ -5,5 +5,11 @@ namespace GraphQLClient.Services
         Staging,
         Production,
     }
+
+    public enum OAuthType
+    {
+        OAuth,
+        OAuth_PKCE,
+    }
 }
 

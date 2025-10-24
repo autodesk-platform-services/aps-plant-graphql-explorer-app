@@ -19,13 +19,15 @@ namespace GraphQLClient.Services
         private readonly OAuthClientOptions _options;
         private bool _disposed;
         private OAuthTokenResult? _accessToken;
+        private OAuthType _oAuthType;
         private DateTime _tokenExpiresAt = DateTime.MinValue;
 
-        private readonly record struct PkceData(string State, string Verifier, string Challenge);
+        private readonly record struct PkceData(string State, string Verifier, string Challenge, bool Initialized);
 
-        private OAuthPasswordTokenService(OAuthClientOptions options, HttpClient httpClient)
+        private OAuthPasswordTokenService(OAuthClientOptions options, OAuthType oAuthType, HttpClient httpClient)
         {
             _options = options;
+            _oAuthType = oAuthType;
             _httpClient = httpClient;
         }
 
@@ -39,10 +41,10 @@ namespace GraphQLClient.Services
 
         public string Scope => _options.Scope;
 
-        public static OAuthPasswordTokenService CreateDefault(GraphQLEnvironment environment)
+        public static OAuthPasswordTokenService CreateDefault(GraphQLEnvironment environment, OAuthType oAuthType)
         {
             var options = OAuthClientOptions.CreateFromEnvironment(environment);
-            return new OAuthPasswordTokenService(options, CreateHttpClient());
+            return new OAuthPasswordTokenService(options, oAuthType, CreateHttpClient());
         }
 
         public async Task<OAuthTokenResult> RequestTokenAsync(CancellationToken cancellationToken = default)
@@ -75,21 +77,22 @@ namespace GraphQLClient.Services
             listener.Prefixes.Add($"{RedirectUri.AbsoluteUri.TrimEnd('/')}/");
             listener.Start();
 
-            var pkce = CreatePkceData();
-            var authorizeUrl = BuildAuthorizeUrl(pkce);
+            await CreatePKCEURL(listener, _oAuthType, cancellationToken);
+            //var pkce = CreatePkceData();
+            //var authorizeUrl = BuildAuthorizeUrl(pkce);
 
-            Process.Start(new ProcessStartInfo(authorizeUrl) { UseShellExecute = true });
+            //Process.Start(new ProcessStartInfo(authorizeUrl) { UseShellExecute = true });
 
-            try
-            {
-                var code = await WaitForAuthorizationCodeAsync(listener, pkce.State, cancellationToken).ConfigureAwait(false);
-                var result = await RedeemAuthorizationCodeAsync(code, pkce, cancellationToken).ConfigureAwait(false);
-                CacheToken(result);
-            }
-            finally
-            {
-                listener.Stop();
-            }
+            //try
+            //{
+            //    var code = await WaitForAuthorizationCodeAsync(listener, pkce.State, cancellationToken).ConfigureAwait(false);
+            //    var result = await RedeemAuthorizationCodeAsync(code, pkce, cancellationToken).ConfigureAwait(false);
+            //    CacheToken(result);
+            //}
+            //finally
+            //{
+            //    listener.Stop();
+            //}
             return _accessToken!;
         }
 
@@ -151,6 +154,25 @@ namespace GraphQLClient.Services
             }
         }
 
+        private async Task CreatePKCEURL(HttpListener listener, OAuthType oAuthType, CancellationToken cancellationToken)
+        {
+            var pkce = CreatePkceData(oAuthType == OAuthType.OAuth_PKCE);
+            var authorizeUrl = BuildAuthorizeUrl(pkce);
+
+            Process.Start(new ProcessStartInfo(authorizeUrl) { UseShellExecute = true });
+
+            try
+            {
+                var code = await WaitForAuthorizationCodeAsync(listener, pkce, cancellationToken).ConfigureAwait(false);
+                var result = await RedeemAuthorizationCodeAsync(code, pkce, cancellationToken).ConfigureAwait(false);
+                CacheToken(result);
+            }
+            finally
+            {
+                listener.Stop();
+            }
+        }
+
         private void CacheToken(OAuthTokenResult result)
         {
             if (!result.IsSuccess)
@@ -180,11 +202,15 @@ namespace GraphQLClient.Services
                 ["client_id"] = _options.ClientId,
                 ["redirect_uri"] = RedirectUri.AbsoluteUri,
                 ["scope"] = Scope,
-                ["state"] = pkce.State,
-                ["code_challenge"] = pkce.Challenge,
-                ["code_challenge_method"] = "S256",
                 ["prompt"] = "login"
             };
+
+            if (pkce.Initialized)
+            {
+                query["state"] = pkce.State;
+                query["code_challenge"] = pkce.Challenge;
+                query["code_challenge_method"] = "S256";
+            }
 
             var builder = new StringBuilder(AuthorizeEndpoint.AbsoluteUri);
             builder.Append(AuthorizeEndpoint.AbsoluteUri.Contains("?") ? "&" : "?");
@@ -192,7 +218,7 @@ namespace GraphQLClient.Services
             return builder.ToString();
         }
 
-        private static PkceData CreatePkceData()
+        private static PkceData CreatePkceData(bool isInitialized = true)
         {
             var stateBytes = new byte[16];
             RandomNumberGenerator.Fill(stateBytes);
@@ -206,10 +232,10 @@ namespace GraphQLClient.Services
             var challengeBytes = sha256.ComputeHash(Encoding.ASCII.GetBytes(verifier));
             var challenge = Base64UrlEncode(challengeBytes);
 
-            return new PkceData(state, verifier, challenge);
+            return new PkceData(state, verifier, challenge, isInitialized);
         }
 
-        private static async Task<string> WaitForAuthorizationCodeAsync(HttpListener listener, string state, CancellationToken cancellationToken)
+        private static async Task<string> WaitForAuthorizationCodeAsync(HttpListener listener, PkceData pkce, CancellationToken cancellationToken)
         {
             while (true)
             {
@@ -235,7 +261,7 @@ namespace GraphQLClient.Services
                     throw new InvalidOperationException($"OAuth authorization failed: {error}");
                 }
 
-                if (string.Equals(returnedState, state, StringComparison.Ordinal) && !string.IsNullOrWhiteSpace(code))
+                if (pkce.Initialized && string.Equals(returnedState, pkce.State, StringComparison.Ordinal) && !string.IsNullOrWhiteSpace(code))
                 {
                     await WriteResponseAsync(context.Response, "You may close this window and return to the application.").ConfigureAwait(false);
                     context.Response.Close();
@@ -298,7 +324,10 @@ namespace GraphQLClient.Services
             {
                 yield return new KeyValuePair<string, string>("client_id", _options.ClientId);
             }
-            yield return new KeyValuePair<string, string>("code_verifier", pkce.Verifier);
+            if (pkce.Initialized)
+            {
+                yield return new KeyValuePair<string, string>("code_verifier", pkce.Verifier);
+            }
         }
 
         private static string Base64UrlEncode(byte[] bytes)

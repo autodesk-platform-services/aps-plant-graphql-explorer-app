@@ -8,6 +8,30 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Update="Configuration.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Configuration.settings</DependentUpon>
+    </Compile>
+    <Compile Update="ConfigurationStg.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ConfigurationStg.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Configuration.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Configuration.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="ConfigurationStg.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>ConfigurationStg.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
   <!--<ItemGroup>
     <PackageReference Include="Duende.IdentityModel" Version="7.1.0" />
   </ItemGroup>-->

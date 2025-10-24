@@ -16,7 +16,8 @@
             <ComboBox x:Name="EnvironmentComboBox"
                       Height="34"
                       Margin="0 6 0 0"
-                      SelectedIndex="0">
+                      SelectedIndex="0"
+                      SelectionChanged="EnvironmentComboBox_SelectionChanged">
                 <ComboBoxItem Content="Staging" Tag="Staging" />
                 <ComboBoxItem Content="Production" Tag="Production" />
             </ComboBox>
@@ -29,15 +30,133 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="LoginButton"
+            <StackPanel Orientation="Vertical">
+                <Button x:Name="LoginButton"
                     Content="Sign in with Autodesk"
                     Height="38"
-                    Background="#FF2D74DA"
-                    Foreground="White"
                     FontWeight="SemiBold"
                     BorderBrush="#FF255FC0"
+                    IsEnabled="False"
                     Click="LoginButton_Click"
-                    TabIndex="2" />
+                    TabIndex="2">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Background" Value="#FF2D74DA" />
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="BorderBrush" Value="#FF255FC0" />
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#FFB0C4E6" />
+                                <Setter Property="Foreground" Value="Gray" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+                <Button x:Name="ConfigButton"
+                     Height="15"
+                     Width="15"
+                     Background="Transparent"
+                     BorderBrush="Transparent"
+                     HorizontalAlignment="Left"
+                     Margin="0 8 0 0"
+                     Click="ConfigButton_Click"
+                     TabIndex="3">
+                     <Path Data="M1,5 L5.5,9 L10,5 Z"
+                           Stroke="Gray"
+                           StrokeThickness="1"
+                           Fill="Gray"
+                           StrokeStartLineCap="Round"
+                           StrokeEndLineCap="Round"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+                 </Button>
+
+                 <Border x:Name="ConfigBorder"
+                         BorderBrush="#FFCCCCCC"
+                         BorderThickness="1"
+                         Padding="8"
+                         Margin="0 8 0 0"
+                         Visibility="Collapsed">
+                    <TabControl x:Name="AuthTabControl" SelectionChanged="TabControl_SelectionChanged">
+                        <TabItem Header="OAuth">
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                                <Grid Margin="0 0 0 4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Client ID:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    <TextBox Grid.Column="1"
+                                         x:Name="ClientIdTextBox"
+                                         HorizontalAlignment="Stretch"
+                                         Height="24"
+                                         Margin="8 0 0 0"
+                                         Text="" />
+                                </Grid>
+
+                                <Grid Margin="0 0 0 4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Client Secret:" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <PasswordBox Grid.Column="1"
+                                         x:Name="ClientSecretTextBox"
+                                         HorizontalAlignment="Stretch"
+                                         Height="24"
+                                         Margin="8 0 0 0"/>
+                                </Grid>
+                                
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Callback URL:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    <TextBox Grid.Column="1"
+                                         x:Name="CallbackUrlTextBox"
+                                         Height="24"
+                                         Margin="8 0 0 0"
+                                         Text="" />
+                                </Grid>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="OAuth (with PKCE)">
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                                <Grid Margin="0 0 0 4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Client ID:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    <TextBox Grid.Column="1"
+                                         x:Name="ClientIdPKCETextBox"
+                                         HorizontalAlignment="Stretch"
+                                         Height="24"
+                                         Margin="8 0 0 0"
+                                         Text="" />
+                                </Grid>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Callback URL:" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    <TextBox Grid.Column="1"
+                                         x:Name="CallbackPKCEUrlTextBox"
+                                         Height="24"
+                                         Margin="8 0 0 0"
+                                         Text="" />
+                                </Grid>
+                            </StackPanel>
+                        </TabItem>
+                    </TabControl>
+                     
+                 </Border>
+            </StackPanel>
 
             <ProgressBar x:Name="LoginProgressBar"
                          Grid.Column="1"

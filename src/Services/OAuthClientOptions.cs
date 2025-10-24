@@ -45,15 +45,17 @@ namespace GraphQLClient.Services
                 {
                     Authorize = "https://developer-stg.api.autodesk.com/authentication/v2/authorize",
                     Token = "https://developer-stg.api.autodesk.com/authentication/v2/token",
-                    ClientId = "A74ztMCm6dFTk3tgtAR8IVbLLU7QsIqGHY6gnKb6WkWRvNdl" ?? string.Empty,
-                    ClientSecret = "" ?? string.Empty
+                    ClientId = ConfigurationStg.Default.ClientID,
+                    ClientSecret = ConfigurationStg.Default.ClientSecret,
+                    Callback = ConfigurationStg.Default.CallbackURL
                 },
                 GraphQLEnvironment.Production => new
                 {
                     Authorize = "https://developer.api.autodesk.com/authentication/v2/authorize",
                     Token = "https://developer.api.autodesk.com/authentication/v2/token",
-                    ClientId = "" ?? string.Empty,
-                    ClientSecret = "" ?? string.Empty
+                    ClientId = Configuration.Default.ClientID,
+                    ClientSecret = Configuration.Default.ClientSecret,
+                    Callback = Configuration.Default.CallbackURL
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(environment), environment, "Unknown environment."),
             };
@@ -62,7 +64,7 @@ namespace GraphQLClient.Services
             var tokenUrl = System.Environment.GetEnvironmentVariable("OAUTH_TOKEN_URL") ?? defaults.Token;
             var clientId = System.Environment.GetEnvironmentVariable("OAUTH_CLIENT_ID") ?? defaults.ClientId;
             var clientSecret = System.Environment.GetEnvironmentVariable("OAUTH_CLIENT_SECRET") ?? defaults.ClientSecret;
-            var redirectUrl = System.Environment.GetEnvironmentVariable("OAUTH_CALLBACK_URL") ?? "http://localhost:8080/oauth/callback";
+            var redirectUrl = System.Environment.GetEnvironmentVariable("OAUTH_CALLBACK_URL") ?? defaults.Callback;
             var scope = System.Environment.GetEnvironmentVariable("OAUTH_SCOPE") ?? "data:read data:write data:create";
 
             if (!Uri.TryCreate(authorizeUrl, UriKind.Absolute, out var authorizeEndpoint))
@@ -85,7 +87,7 @@ namespace GraphQLClient.Services
                 authorizeEndpoint,
                 tokenEndpoint,
                 clientId,
-                string.IsNullOrWhiteSpace(clientSecret) ? null : clientSecret,
+                clientSecret,
                 redirectUri,
                 scope);
         }
