@@ -261,7 +261,7 @@ namespace GraphQLClient.Services
                     throw new InvalidOperationException($"OAuth authorization failed: {error}");
                 }
 
-                if (pkce.Initialized && string.Equals(returnedState, pkce.State, StringComparison.Ordinal) && !string.IsNullOrWhiteSpace(code))
+                if (!pkce.Initialized || (pkce.Initialized && string.Equals(returnedState, pkce.State, StringComparison.Ordinal) && !string.IsNullOrWhiteSpace(code)))
                 {
                     await WriteResponseAsync(context.Response, "You may close this window and return to the application.").ConfigureAwait(false);
                     context.Response.Close();
