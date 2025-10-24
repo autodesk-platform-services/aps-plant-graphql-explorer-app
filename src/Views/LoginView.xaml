@@ -1,0 +1,61 @@
+<UserControl x:Class="GraphQLClient.Views.LoginView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <StackPanel KeyboardNavigation.TabNavigation="Cycle">
+        <TextBlock Text="Sign in"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Margin="0 0 0 24" />
+
+        <StackPanel Margin="0 0 0 16">
+            <TextBlock Text="Choose Environment:" FontWeight="SemiBold" />
+            <ComboBox x:Name="EnvironmentComboBox"
+                      Height="34"
+                      Margin="0 6 0 0"
+                      SelectedIndex="0">
+                <ComboBoxItem Content="Staging" Tag="Staging" />
+                <ComboBoxItem Content="Production" Tag="Production" />
+            </ComboBox>
+        </StackPanel>
+
+
+        <Grid Margin="0 0 0 12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="LoginButton"
+                    Content="Sign in with Autodesk"
+                    Height="38"
+                    Background="#FF2D74DA"
+                    Foreground="White"
+                    FontWeight="SemiBold"
+                    BorderBrush="#FF255FC0"
+                    Click="LoginButton_Click"
+                    TabIndex="2" />
+
+            <ProgressBar x:Name="LoginProgressBar"
+                         Grid.Column="1"
+                         Margin="16 0 0 0"
+                         Width="68"
+                         Height="8"
+                         VerticalAlignment="Center"
+                         Visibility="Collapsed"
+                         IsIndeterminate="True" />
+        </Grid>
+
+        <TextBlock x:Name="StatusTextBlock"
+                   Text=""
+                   FontSize="12"
+                   Foreground="#FF2D74DA"
+                   TextWrapping="Wrap"
+                   AutomationProperties.Name="Status message" />
+    </StackPanel>
+</UserControl>
+
+

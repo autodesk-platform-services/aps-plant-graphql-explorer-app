@@ -1,0 +1,64 @@
+<UserControl x:Class="GraphQLClient.Views.AppView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary x:Uid="ResourceDictionary_2" Source="Style.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid KeyboardNavigation.TabNavigation="Cycle">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock Grid.Row="0"
+                   Text="GraphQL Client"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Margin="0 0 0 24" />
+
+        <DockPanel Grid.Row="1" HorizontalAlignment="Stretch">
+            <Button x:Name="backButton"
+                    Content="Previous View"
+                    Margin="12"
+                    Width="90"
+                    Height="24"
+                    DockPanel.Dock="Left"
+                    Click="backButton_Click">
+                <Button.Style>
+                    <Style BasedOn="{StaticResource OutlineButtonStyle}" TargetType="Button">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ParentView}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button 
+                x:Name="freshViewButton"
+                Style="{StaticResource OutlineButtonStyle}"
+                Content="Refresh View"
+                Margin="12"
+                Height="24"
+                Width="90"
+                DockPanel.Dock="Right"
+                Click="freshViewButton_Click"/>
+        </DockPanel>
+
+        <Grid x:Name="ViewGrid"
+                  Grid.Row="2"
+                  Margin="12"/>
+    </Grid>
+</UserControl>
+
+
