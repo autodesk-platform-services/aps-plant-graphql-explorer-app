@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="GraphQL Client" Height="420" Width="695"
         MinHeight="360" MinWidth="360"
+        Icon="/Resources/launch.ico"
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded">
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
