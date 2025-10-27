@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GraphQLClient.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="680">
     <local:BaseView.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <SolidColorBrush x:Key="SearchResultsHeaderBackgroundBrush" Color="#EDF3FF" />
@@ -103,23 +103,63 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5,10,0,10">
-            <ComboBox x:Name="partTypeCombobox"
-                  Width="150" Height="25"
-                  SelectionChanged="partTypeCombobox_SelectionChanged" 
-                  SelectedIndex="-1">
-                <ComboBoxItem Content="ProcessPower" />
-                <ComboBoxItem Content="Piping" />
-            </ComboBox>
-            
-            <TextBox x:Name="searchTextBox" Width="400" Height="25" Margin="50,0,10,0" />
-            <Button Content="Search" Width="75" Height="25" Click="SearchButton_Click" />
-            <Button Content="Export CSV"
-                    Width="90"
-                    Height="25"
-                    Margin="10,0,0,0"
-                    Click="ExportButton_Click" />
-        </StackPanel>
+
+        <Grid Grid.Row="0" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <RichTextBox x:Name="searchTextBox"
+                 Grid.Column="0"
+                 Width="520"
+                 Height="80"
+                 Margin="5,0,0,0"
+                 FontFamily="Segoe UI"
+                 FontSize="13"
+                 Foreground="#1F2937"
+                 Background="#F9FBFF"
+                 BorderBrush="#C6D4F2"
+                 BorderThickness="1"
+                 AcceptsReturn="True"
+                 AcceptsTab="True"
+                 HorizontalContentAlignment="Left"
+                 HorizontalScrollBarVisibility="Disabled"
+                 VerticalScrollBarVisibility="Auto"
+                 SpellCheck.IsEnabled="True">
+                <RichTextBox.Resources>
+                    <Style TargetType="FlowDocument">
+                        <Setter Property="PagePadding" Value="0" />
+                        <Setter Property="LineHeight" Value="3" />
+                    </Style>
+                    <Style TargetType="Paragraph">
+                        <Setter Property="Margin" Value="0" />
+                    </Style>
+                </RichTextBox.Resources>
+            </RichTextBox>
+            <Grid Grid.Column="1" HorizontalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <ComboBox x:Name="partTypeCombobox"
+                      Grid.Row="0"
+                      HorizontalAlignment="Center"
+                      Margin="30,0,10,5"
+                      Width="100" Height="25"
+                      SelectionChanged="partTypeCombobox_SelectionChanged" 
+                      SelectedIndex="-1">
+                    <ComboBoxItem Content="ProcessPower" />
+                    <ComboBoxItem Content="Piping" />
+                </ComboBox>
+                <Button Grid.Row="1" Margin="30,0,10,5" Content="Search" Width="100" Height="25" Click="SearchButton_Click" />
+                <Button Grid.Row="2" Margin="30,0,10,0" Content="Export CSV"
+                        Width="100"
+                        Height="25"
+                        Click="ExportButton_Click" />
+            </Grid>
+
+        </Grid>
 
         <Border Grid.Row="1"
                 Margin="10"

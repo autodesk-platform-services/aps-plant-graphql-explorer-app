@@ -10,6 +10,8 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using System.Windows;
+using GraphQLClient.Views;
 
 namespace GraphQLClient.Services
 {
@@ -159,7 +161,15 @@ namespace GraphQLClient.Services
             var pkce = CreatePkceData(oAuthType == OAuthType.OAuth_PKCE);
             var authorizeUrl = BuildAuthorizeUrl(pkce);
 
-            Process.Start(new ProcessStartInfo(authorizeUrl) { UseShellExecute = true });
+            //Process.Start(new ProcessStartInfo(authorizeUrl) { UseShellExecute = true });
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                var dialog = new OAuthWindow(new Uri(authorizeUrl), RedirectUri)
+                {
+                    Owner = Application.Current.MainWindow
+                };
+                dialog.Show();
+            });
 
             try
             {

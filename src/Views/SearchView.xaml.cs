@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace GraphQLClient.Views
 {
@@ -127,7 +128,8 @@ namespace GraphQLClient.Views
             try
             {
                 var elementGroupId = await GetGroupElement(_currentPartTypeUrn);
-                await SearchDataAsync(elementGroupId, searchTextBox.Text.Trim());
+                var textRange = new TextRange(searchTextBox.Document.ContentStart, searchTextBox.Document.ContentEnd);
+                await SearchDataAsync(elementGroupId, textRange.Text.Trim().Replace("\r\n", " "));
             }
             finally
             {

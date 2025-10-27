@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:GraphQLClient.Views"
         mc:Ignorable="d"
-        Title="GraphQL Client" Height="420" Width="420"
+        Title="GraphQL Client" Height="420" Width="695"
         MinHeight="360" MinWidth="360"
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded">
