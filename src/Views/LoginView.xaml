@@ -36,7 +36,6 @@
                     Height="38"
                     FontWeight="SemiBold"
                     BorderBrush="#FF255FC0"
-                    IsEnabled="False"
                     Click="LoginButton_Click"
                     TabIndex="2">
                 <Button.Style>
@@ -119,7 +118,7 @@
                                          x:Name="CallbackUrlTextBox"
                                          Height="24"
                                          Margin="8 0 0 0"
-                                         Text="" />
+                                         Text=""/>
                                 </Grid>
                             </StackPanel>
                         </TabItem>

@@ -1,4 +1,5 @@
 using System;
+using System.Reflection.Metadata;
 using static System.Net.WebRequestMethods;
 
 namespace GraphQLClient.Services
@@ -37,7 +38,7 @@ namespace GraphQLClient.Services
 
         public string Scope { get; }
 
-        public static OAuthClientOptions CreateFromEnvironment(GraphQLEnvironment environment)
+        public static OAuthClientOptions CreateFromEnvironment(GraphQLEnvironment environment, OAuthType oAuthType)
         {
             var defaults = environment switch
             {
@@ -69,17 +70,27 @@ namespace GraphQLClient.Services
 
             if (!Uri.TryCreate(authorizeUrl, UriKind.Absolute, out var authorizeEndpoint))
             {
-                throw new InvalidOperationException($"Invalid OAuth authorize URL: {authorizeUrl}");
+                throw new InvalidOperationException($"Invalid OAuth authorize URL: {ErrorMessage(authorizeUrl)}");
             }
 
             if (!Uri.TryCreate(tokenUrl, UriKind.Absolute, out var tokenEndpoint))
             {
-                throw new InvalidOperationException($"Invalid OAuth token URL: {tokenUrl}");
+                throw new InvalidOperationException($"Invalid OAuth token URL: {ErrorMessage(tokenUrl)}");
+            }
+
+            if (string.IsNullOrWhiteSpace(clientId))
+            {
+                throw new InvalidOperationException("OAuth client ID is not set.");
+            }
+
+            if (string.IsNullOrWhiteSpace(clientSecret) && oAuthType == OAuthType.OAuth)
+            {
+                throw new InvalidOperationException("OAuth client secret is not set.");
             }
 
             if (!Uri.TryCreate(redirectUrl, UriKind.Absolute, out var redirectUri))
             {
-                throw new InvalidOperationException($"Invalid OAuth redirect URL: {redirectUrl}");
+                throw new InvalidOperationException($"Invalid OAuth redirect URL: {ErrorMessage(redirectUrl)}");
             }
 
             return new OAuthClientOptions(
@@ -91,6 +102,8 @@ namespace GraphQLClient.Services
                 redirectUri,
                 scope);
         }
+
+        private static string ErrorMessage(string url) => string.IsNullOrEmpty(url) ? "Empty" : url;
     }
 }
 

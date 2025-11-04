@@ -20,7 +20,7 @@ namespace GraphQLClient.Views
         public LoginView()
         {
             InitializeComponent();
-            Loaded += delegate { LoginButton.IsEnabled = IsClientConfigurationSet(); };
+            Loaded += delegate { SetClientConfiguration(_currentEnv); };
         }
 
         private GraphQLEnvironment _currentEnv;
@@ -35,6 +35,7 @@ namespace GraphQLClient.Views
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            SaveClientConfiguration(_currentEnv);
             LoginClicked?.Invoke(sender, new LoginEventArgs(_currentEnv, _currentOAuthType));
         }
 
@@ -50,8 +51,6 @@ namespace GraphQLClient.Views
             {
                 SaveClientConfiguration(_currentEnv);
             }
-
-            LoginButton.IsEnabled = IsClientConfigurationSet();
         }
 
         private void EnvironmentComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -105,59 +104,23 @@ namespace GraphQLClient.Views
                     _ => ""
                 };
             }
-
-            LoginButton.IsEnabled = IsClientConfigurationSet();
         }
 
         private void SaveClientConfiguration(GraphQLEnvironment currentEnv)
         {
-            if (currentEnv == GraphQLEnvironment.Staging)
-            {
-                if (_currentOAuthType == OAuthType.OAuth)
-                {
-                    ConfigurationStg.Default.ClientID = ClientIdTextBox.Text;
-                    ConfigurationStg.Default.CallbackURL = CallbackUrlTextBox.Text;
-                    ConfigurationStg.Default.ClientSecret = ClientSecretTextBox.Password;
-                }
-                else
-                {
-                    ConfigurationStg.Default.ClientID_PKCE = ClientIdPKCETextBox.Text;
-                    ConfigurationStg.Default.CallbackURL_PKCE = CallbackPKCEUrlTextBox.Text;
-                }
-                ConfigurationStg.Default.Save();
-            }
-            else
-            {
-                if (_currentOAuthType == OAuthType.OAuth_PKCE)
-                {
-                    Configuration.Default.ClientID = ClientIdTextBox.Text;
-                    Configuration.Default.CallbackURL = CallbackUrlTextBox.Text;
-                    Configuration.Default.ClientSecret = ClientSecretTextBox.Password;
-                }
-                else
-                {
-                    Configuration.Default.ClientID_PKCE = ClientIdPKCETextBox.Text;
-                    Configuration.Default.CallbackURL_PKCE = CallbackPKCEUrlTextBox.Text;
-                }
-                Configuration.Default.Save();
-            }
-        }
-
-        private bool IsClientConfigurationSet()
-        {
+            dynamic config = currentEnv == GraphQLEnvironment.Staging ? ConfigurationStg.Default : Configuration.Default;
             if (_currentOAuthType == OAuthType.OAuth)
             {
-                var clientId = _currentEnv == GraphQLEnvironment.Staging ? ConfigurationStg.Default.ClientID : Configuration.Default.ClientID;
-                var clientSecret = _currentEnv == GraphQLEnvironment.Staging ? ConfigurationStg.Default.ClientSecret : Configuration.Default.ClientSecret;
-                var callbackUrl = _currentEnv == GraphQLEnvironment.Staging ? ConfigurationStg.Default.CallbackURL : Configuration.Default.CallbackURL;
-                return !string.IsNullOrEmpty(clientId) && !string.IsNullOrEmpty(clientSecret) && !string.IsNullOrEmpty(callbackUrl);
+                config.ClientID = ClientIdTextBox.Text;
+                config.ClientSecret = ClientSecretTextBox.Password;
+                config.CallbackURL = CallbackUrlTextBox.Text;
             }
             else
             {
-                var clientIdPKCE = _currentEnv == GraphQLEnvironment.Staging ? ConfigurationStg.Default.ClientID_PKCE : Configuration.Default.ClientID_PKCE;
-                var callbackPKCEUrl = _currentEnv == GraphQLEnvironment.Staging ? ConfigurationStg.Default.CallbackURL_PKCE : Configuration.Default.CallbackURL_PKCE;
-                return !string.IsNullOrEmpty(clientIdPKCE) && !string.IsNullOrEmpty(callbackPKCEUrl);
+                config.ClientID_PKCE = ClientIdPKCETextBox.Text;
+                config.CallbackURL_PKCE = CallbackPKCEUrlTextBox.Text;
             }
+            config.Save();
         }
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)

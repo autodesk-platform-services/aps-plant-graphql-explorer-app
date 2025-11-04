@@ -45,8 +45,9 @@ namespace GraphQLClient.Services
 
         public static OAuthPasswordTokenService CreateDefault(GraphQLEnvironment environment, OAuthType oAuthType)
         {
-            var options = OAuthClientOptions.CreateFromEnvironment(environment);
+            var options = OAuthClientOptions.CreateFromEnvironment(environment, oAuthType);
             return new OAuthPasswordTokenService(options, oAuthType, CreateHttpClient());
+
         }
 
         public async Task<OAuthTokenResult> RequestTokenAsync(CancellationToken cancellationToken = default)

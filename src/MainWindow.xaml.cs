@@ -138,8 +138,15 @@ namespace GraphQLClient
 
         private async void LoginView_LoginClicked(object? sender, LoginEventArgs e)
         {
-            _tokenService = OAuthPasswordTokenService.CreateDefault(e.Environment, e.OAuthType);
-            await AttemptLoginAsync();
+            try
+            {
+                _tokenService = OAuthPasswordTokenService.CreateDefault(e.Environment, e.OAuthType);
+                await AttemptLoginAsync();
+            }
+            catch (Exception ex)
+            {
+                ShowStatus($"{ex.Message}", Brushes.OrangeRed);
+            }
         }
 
         private void AppView_SearchClicked(object? sender, RoutedEventArgs e)
