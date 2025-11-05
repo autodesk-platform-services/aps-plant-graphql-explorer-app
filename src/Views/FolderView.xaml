@@ -7,7 +7,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ListView x:Name="folders" ItemsSource="{Binding Folders}"
+        <ListView x:Name="folders" 
+                  Height="450"
+                  ItemsSource="{Binding Folders}"
                   MouseDoubleClick="folders_MouseDoubleClick">
             <ListView.ItemTemplate>
                 <DataTemplate>

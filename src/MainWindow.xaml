@@ -6,7 +6,7 @@
         xmlns:views="clr-namespace:GraphQLClient.Views"
         mc:Ignorable="d"
         Title="GraphQL Client"
-        Width="600"
+        Height="400" Width="800"
         MinHeight="100" MinWidth="300"
         Icon="/Resources/launch.ico"
         WindowStartupLocation="CenterScreen"

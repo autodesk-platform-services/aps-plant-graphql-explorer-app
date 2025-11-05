@@ -23,7 +23,7 @@ namespace GraphQLClient.Views
     /// </summary>
     public partial class FolderView : BaseView, INotifyPropertyChanged
     {
-        private Stack<string> _foldersCache = new Stack<string>();
+        private Stack<KeyValuePair<string, List<Folder>>> _foldersCache = new Stack<KeyValuePair<string, List<Folder>>>();
         private string _projectId;
         private string _folderUrn;
 
@@ -56,8 +56,13 @@ namespace GraphQLClient.Views
             bool hasCached = _foldersCache.Count > 0;
             if (hasCached)
             {
-                _projectId = _foldersCache.Pop();
-                await LoadFoldersAsync();
+                var cached = _foldersCache.Pop();
+                _folderUrn = cached.Key;
+                Folders.Clear();
+                foreach (var folder in cached.Value)
+                {
+                    Folders.Add(folder);
+                }
             }
             return await Task.FromResult(hasCached);
         }
@@ -81,6 +86,7 @@ namespace GraphQLClient.Views
                         // show earch view
                         //
                         _appView.SetView(new SearchView(_appView, this, _projectId, pid?.Id, p3d?.Id));
+                        _foldersCache.Pop();
                     }
                     else
                     {
@@ -89,8 +95,6 @@ namespace GraphQLClient.Views
                         {
                             Folders.Add(folder);
                         }
-
-                        _foldersCache.Push(_projectId);
                     }
                 }
             }
@@ -105,6 +109,12 @@ namespace GraphQLClient.Views
         {
             if (sender is ListView listView && listView.SelectedItem is Folder selectedFolder)
             {
+                // cache current folder list
+                //
+                _foldersCache.Push(new KeyValuePair<string, List<Folder>>(_folderUrn, Folders.ToList()));
+
+                // next level
+                //
                 _folderUrn = selectedFolder.Id;
                 await LoadFoldersAsync();
             }
