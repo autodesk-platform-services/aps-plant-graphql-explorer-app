@@ -1,4 +1,5 @@
-﻿using GraphQLClient.Services;
+﻿using GraphQLClient.Commands;
+using GraphQLClient.Services;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -20,7 +21,7 @@ namespace GraphQLClient.Views
         public LoginView()
         {
             InitializeComponent();
-            Loaded += delegate { SetClientConfiguration(_currentEnv); };
+            Loaded += delegate { SetClientConfiguration(_currentEnv); GQLRequest.Environment = _currentEnv; };
         }
 
         private GraphQLEnvironment _currentEnv;
@@ -58,6 +59,7 @@ namespace GraphQLClient.Views
             if (EnvironmentComboBox.SelectedItem is ComboBoxItem selectedItem)
             {
                 _currentEnv = Enum.TryParse<GraphQLEnvironment>(selectedItem.Tag.ToString(), out var env) ? env : GraphQLEnvironment.Staging;
+                GQLRequest.Environment = _currentEnv;
 
                 if (ConfigBorder != null)
                 {

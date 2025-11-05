@@ -11,7 +11,8 @@ namespace GraphQLClient.Commands
 {
     internal class GQLRequest
     {
-        private string _baseUrl = "https://developer-stg.api.autodesk.com/aec/graphql";
+        private string _baseUrlStg = "https://developer-stg.api.autodesk.com/aec/graphql";
+        private string _baseUrlProd = "https://developer.api.autodesk.com/aec/graphql";
         private static readonly Lazy<GQLRequest> _instance = new Lazy<GQLRequest>(() => new GQLRequest());
         private readonly HttpClient _httpClient = CreateHttpClient();
 
@@ -35,6 +36,7 @@ namespace GraphQLClient.Commands
         public static OAuthPasswordTokenService TokenService { get; set; }
 
         public static GQLRequest Instance => _instance.Value;
+        public static GraphQLEnvironment Environment { get; set; } = GraphQLEnvironment.Staging;
 
         public async Task<T?> QueryAsync<T>(string query, object? variables = null, CancellationToken cancellationToken = default)
         {
@@ -53,7 +55,8 @@ namespace GraphQLClient.Commands
             
             var jsonContent = JsonSerializer.Serialize(requestBody);
             
-            using var message = new HttpRequestMessage(HttpMethod.Post, _baseUrl)
+            var baseUrl = Environment == GraphQLEnvironment.Staging ? _baseUrlStg : _baseUrlProd;
+            using var message = new HttpRequestMessage(HttpMethod.Post, baseUrl)
             {
                 Content = new StringContent(jsonContent, Encoding.UTF8, "application/json"),
                 Headers =
