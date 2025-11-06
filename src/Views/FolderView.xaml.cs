@@ -23,7 +23,6 @@ namespace GraphQLClient.Views
     /// </summary>
     public partial class FolderView : BaseView, INotifyPropertyChanged
     {
-        private Stack<KeyValuePair<string, List<Folder>>> _foldersCache = new Stack<KeyValuePair<string, List<Folder>>>();
         private string _projectId;
         private string _folderUrn;
 
@@ -51,27 +50,11 @@ namespace GraphQLClient.Views
             }
         }
 
-        public async Task<bool> BackToParentFolder()
-        {
-            bool hasCached = _foldersCache.Count > 0;
-            if (hasCached)
-            {
-                var cached = _foldersCache.Pop();
-                _folderUrn = cached.Key;
-                Folders.Clear();
-                foreach (var folder in cached.Value)
-                {
-                    Folders.Add(folder);
-                }
-            }
-            return await Task.FromResult(hasCached);
-        }
-
-        private async Task LoadFoldersAsync()
+        private async Task LoadFoldersAsync(Folder current = default)
         {
             try
             {
-                dynamic response = _foldersCache.Count == 0 ? 
+                dynamic response = string.IsNullOrEmpty(_folderUrn) ? 
                     await GQLRequest.Instance.QueryAsync<GraphQLResponse<ProjectFolderData>>(QueryCommands.Query_FolderByProject, new { projectId = _projectId }) :
                     await GQLRequest.Instance.QueryAsync<GraphQLResponse<ProjectFolderByFolderData>>(QueryCommands.Query_SpecialFolder, new { projectId = _projectId, folderId = _folderUrn });
 
@@ -86,14 +69,20 @@ namespace GraphQLClient.Views
                         // show earch view
                         //
                         _appView.SetView(new SearchView(_appView, this, _projectId, pid?.Id, p3d?.Id));
-                        _foldersCache.Pop();
                     }
                     else
                     {
-                        Folders.Clear();
-                        foreach (var folder in response.Data.Folders.Results)
+                        if (current == null)
                         {
-                            Folders.Add(folder);
+                            Folders.Clear();
+                            foreach (var folder in response.Data.Folders.Results)
+                            {
+                                Folders.Add(folder);
+                            }
+                        }
+                        else
+                        {
+                            current.Children = new List<Folder>(response.Data.Folders.Results);
                         }
                     }
                 }
@@ -107,16 +96,12 @@ namespace GraphQLClient.Views
 
         private async void folders_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (sender is ListView listView && listView.SelectedItem is Folder selectedFolder)
+            if (sender is TreeView listView && listView.SelectedItem is Folder selectedFolder)
             {
-                // cache current folder list
-                //
-                _foldersCache.Push(new KeyValuePair<string, List<Folder>>(_folderUrn, Folders.ToList()));
-
                 // next level
                 //
                 _folderUrn = selectedFolder.Id;
-                await LoadFoldersAsync();
+                await LoadFoldersAsync(selectedFolder);
             }
         }
     }

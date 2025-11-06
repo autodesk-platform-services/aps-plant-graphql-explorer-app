@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace GraphQLClient.Data
 {
@@ -15,7 +17,7 @@ namespace GraphQLClient.Data
         public Result<Folder>? Folders { get; set; }
     }
 
-    public class Folder
+    public class Folder : INotifyPropertyChanged
     {
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
@@ -23,8 +25,29 @@ namespace GraphQLClient.Data
         [JsonPropertyName("id")]
         public string Id { get; set; } = string.Empty;
 
+        private List<Folder>? _children;
+        public List<Folder>? Children
+        {
+            get => _children;
+            set
+            {
+                if (!ReferenceEquals(_children, value))
+                {
+                    _children = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         [JsonPropertyName("parentFolder")]
         public FolderReference? ParentFolder { get; set; }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public class FolderReference

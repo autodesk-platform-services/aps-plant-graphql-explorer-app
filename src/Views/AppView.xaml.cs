@@ -48,16 +48,8 @@ namespace GraphQLClient.Views
             _currentFreshView?.FreshView();
         }
 
-        private async void backButton_Click(object sender, RoutedEventArgs e)
+        private void backButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentFreshView.ViewType == ViewTypes.Folder)
-            {
-                var hasCached = await ((FolderView)_currentFreshView).BackToParentFolder();
-                if (hasCached)
-                {
-                    return;
-                }
-            }
             SetView(_currentFreshView.ParentView!);
         }
     }
