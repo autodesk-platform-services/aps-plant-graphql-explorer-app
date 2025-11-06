@@ -54,15 +54,15 @@ namespace GraphQLClient.Views
         {
             try
             {
-                dynamic response = string.IsNullOrEmpty(_folderUrn) ? 
+                dynamic? response = string.IsNullOrEmpty(_folderUrn) ?
                     await GQLRequest.Instance.QueryAsync<GraphQLResponse<ProjectFolderData>>(QueryCommands.Query_FolderByProject, new { projectId = _projectId }) :
                     await GQLRequest.Instance.QueryAsync<GraphQLResponse<ProjectFolderByFolderData>>(QueryCommands.Query_SpecialFolder, new { projectId = _projectId, folderId = _folderUrn });
 
 
                 if (response?.Data?.Folders?.Results != null)
                 {
-                    var p3d = (response.Data.Folders.Results as IEnumerable<Folder>).FirstOrDefault(c => string.Compare(c.Name, "Plant 3D Models", StringComparison.OrdinalIgnoreCase) == 0);
-                    var pid =(response.Data.Folders.Results as IEnumerable<Folder>).FirstOrDefault(c => string.Compare(c.Name, "PID DWG", StringComparison.OrdinalIgnoreCase) == 0);
+                    var p3d = (response.Data.Folders.Results as IEnumerable<Folder>)?.FirstOrDefault(c => string.Compare(c.Name, "Plant 3D Models", StringComparison.OrdinalIgnoreCase) == 0);
+                    var pid =(response.Data.Folders.Results as IEnumerable<Folder>)?.FirstOrDefault(c => string.Compare(c.Name, "PID DWG", StringComparison.OrdinalIgnoreCase) == 0);
 
                     if (p3d != null || pid != null)
                     {

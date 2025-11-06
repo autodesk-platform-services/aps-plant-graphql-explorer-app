@@ -16,9 +16,9 @@ namespace GraphQLClient.Views
     public partial class SearchView : BaseView
     {
         private readonly string _projectId;
-        private readonly string _folder2dUrn;
-        private readonly string _folder3dUrn;
-        private string _currentPartTypeUrn;
+        private readonly string? _folder2dUrn;
+        private readonly string? _folder3dUrn;
+        private string? _currentPartTypeUrn;
         private bool _isLoading;
 
         public bool IsLoading
@@ -38,7 +38,7 @@ namespace GraphQLClient.Views
         public override Task LoadData() => LoadSearchResultsAsync();
         public override Task FreshView() => LoadSearchResultsAsync();
 
-        public SearchView(AppView appView, BaseView parentView, string projectId, string folder2dUrn, string folder3dUrn)
+        public SearchView(AppView appView, BaseView parentView, string projectId, string? folder2dUrn, string? folder3dUrn)
             : base(appView, parentView)
         {
             InitializeComponent();
