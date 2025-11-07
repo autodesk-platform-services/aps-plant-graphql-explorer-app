@@ -1,11 +1,13 @@
 ﻿using GraphQLClient.Commands;
 using GraphQLClient.Data;
+using Microsoft.Web.WebView2.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Text;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -24,14 +26,16 @@ namespace GraphQLClient.Views
     public partial class FolderView : BaseView, INotifyPropertyChanged
     {
         private string _projectId;
+        private string _dmProjectId;
         private string _folderUrn;
+        private bool _isLoading;
 
-        public FolderView(AppView appView, BaseView parentView, string projectId, string folderUrn = default)
+        public FolderView(AppView appView, BaseView parentView, string projectId, string dmProjectId)
             : base(appView, parentView)
         {
             InitializeComponent();
             _projectId = projectId;
-            _folderUrn = folderUrn;
+            _dmProjectId = dmProjectId;
             DataContext = this;
         }
 
@@ -50,40 +54,65 @@ namespace GraphQLClient.Views
             }
         }
 
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged();
+            }
+        }
+
         private async Task LoadFoldersAsync(Folder current = default)
         {
             try
             {
-                dynamic? response = string.IsNullOrEmpty(_folderUrn) ?
-                    await GQLRequest.Instance.QueryAsync<GraphQLResponse<ProjectFolderData>>(QueryCommands.Query_FolderByProject, new { projectId = _projectId }) :
-                    await GQLRequest.Instance.QueryAsync<GraphQLResponse<ProjectFolderByFolderData>>(QueryCommands.Query_SpecialFolder, new { projectId = _projectId, folderId = _folderUrn });
-
-
-                if (response?.Data?.Folders?.Results != null)
+                IsLoading = true;
+                if (current != null && current.IsPlantProject)
                 {
-                    var p3d = (response.Data.Folders.Results as IEnumerable<Folder>)?.FirstOrDefault(c => string.Compare(c.Name, "Plant 3D Models", StringComparison.OrdinalIgnoreCase) == 0);
-                    var pid =(response.Data.Folders.Results as IEnumerable<Folder>)?.FirstOrDefault(c => string.Compare(c.Name, "PID DWG", StringComparison.OrdinalIgnoreCase) == 0);
+                    if (string.IsNullOrEmpty(current.PIDDataset) || string.IsNullOrEmpty(current.PipingDataset))
+                    {
+                        // get dataset urns
+                        //
+                        var (pidUrn, p3dUrn) = await GetPlantFilePulsFolderUrns(current);
+                        current.PIDDataset = pidUrn;
+                        current.PipingDataset = p3dUrn;
+                    }
 
-                    if (p3d != null || pid != null)
+                    if (current.PIDDataset != null || current.PipingDataset != null)
                     {
                         // show earch view
                         //
-                        _appView.SetView(new SearchView(_appView, this, _projectId, pid?.Id, p3d?.Id));
+                        _appView.SetView(new SearchView(_appView, this, _projectId, current.PIDDataset, current.PipingDataset));
+                    }
+                }
+                else
+                {
+                    var request = GQLRequest.Instance;
+                    dynamic? response = string.IsNullOrEmpty(_folderUrn) ?
+                        await request.QueryAsync<GraphQLResponse<ProjectFolderData>>(QueryCommands.Query_FolderByProject, new { projectId = _projectId }) :
+                        await request.QueryAsync<GraphQLResponse<ProjectFolderByFolderData>>(QueryCommands.Query_SpecialFolder, new { projectId = _projectId, folderId = _folderUrn });
+
+                    var folders = response.Data.Folders.Results as IEnumerable<Folder>;
+                    if (folders == null)
+                    {
+                        return;
+                    }
+
+                    await CheckPlantProjectFoldersAsync(folders);
+
+                    if (current == null)
+                    {
+                        Folders.Clear();
+                        foreach (var folder in folders)
+                        {
+                            Folders.Add(folder);
+                        }
                     }
                     else
                     {
-                        if (current == null)
-                        {
-                            Folders.Clear();
-                            foreach (var folder in response.Data.Folders.Results)
-                            {
-                                Folders.Add(folder);
-                            }
-                        }
-                        else
-                        {
-                            current.Children = new List<Folder>(response.Data.Folders.Results);
-                        }
+                        current.Children = new List<Folder>(folders);
                     }
                 }
             }
@@ -91,6 +120,10 @@ namespace GraphQLClient.Views
             {
                 // Handle error - could show in UI
                 MessageBox.Show($"Error loading projects: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
@@ -104,5 +137,87 @@ namespace GraphQLClient.Views
                 await LoadFoldersAsync(selectedFolder);
             }
         }
+
+        private async Task CheckPlantProjectFoldersAsync(IEnumerable<Folder>? folders)
+        {
+            if (folders == null)
+            {
+                return;
+            }
+
+            var requestFunc = async (Folder folder) =>
+            {
+                var requestBody = new
+                {
+                    folderUrns = new string[] { folder.Id },
+                    searchText = "PipingPart.xml"
+                };
+                var query = JsonSerializer.Serialize(requestBody);
+                try
+                {
+
+                    var result = await DocsRequest.Instance.QueryAsync<FilePlus>(query, _dmProjectId);
+                    if (result.Documents.Count > 0)
+                    {
+                        folder.IsPlantProject = true;
+                    }
+                }
+                catch (Exception)
+                {
+                    // ignore errors
+                }
+            };
+
+            foreach (var chunk in folders.Chunk(5))
+            {
+                var tasks = chunk.Select(c => requestFunc(c));
+                await Task.WhenAll(tasks);
+            }
+        }
+
+        private async Task<(string pid, string p3d)> GetPlantFilePulsFolderUrns(Folder folder)
+        {
+            var result = (string.Empty, string.Empty);
+            
+            if (folder == null)
+            {
+                return result;
+            }
+
+            // Create proper GraphQL request body
+            var requestBody = new
+            {
+                folderUrns = new string[] { folder.Id },
+                filters = new
+                {
+                    entityType = new
+                    {
+                        value = new string[] { "CONTAINER" }
+                    },
+                    mimeType = new
+                    {
+                        value = "application/vnd.autodesk.aecdm"
+                    }
+                },
+                recursive = true
+            };
+            var query = JsonSerializer.Serialize(requestBody);
+
+            var filePlus = await DocsRequest.Instance.QueryAsync<FilePlus>(query, _dmProjectId);
+            foreach (var doc in filePlus.Documents)
+            {
+                if (string.Compare(doc.Name, "P&ID Data Set", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    result.Item1 = folder.Id;
+                }
+                else if (string.Compare(doc.Name, "3D Piping Data Set", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    result.Item2 = folder.Id;
+                }
+            }
+
+            return result;
+        }
+
     }
 }

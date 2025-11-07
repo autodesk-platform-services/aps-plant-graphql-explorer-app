@@ -82,7 +82,7 @@ namespace GraphQLClient.Views
                     return;
                 }
 
-                var projView = new FolderView(_appView, this, selectedProject.Id);
+                var projView = new FolderView(_appView, this, selectedProject.Id, selectedProject.AlternativeIdentifiers.DataManagementAPIProjectId);
                 _folderViewCache[selectedProject.Id] = projView;
                 _appView.SetView(projView);
             }

@@ -39,6 +39,13 @@ namespace GraphQLClient.Data
             }
         }
 
+        [JsonIgnore]
+        public bool IsPlantProject { get; set; }
+        [JsonIgnore]
+        public string PipingDataset { get; set; }
+        [JsonIgnore]
+        public string PIDDataset { get; set; }
+
         [JsonPropertyName("parentFolder")]
         public FolderReference? ParentFolder { get; set; }
 

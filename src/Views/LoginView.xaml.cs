@@ -59,7 +59,7 @@ namespace GraphQLClient.Views
             if (EnvironmentComboBox.SelectedItem is ComboBoxItem selectedItem)
             {
                 _currentEnv = Enum.TryParse<GraphQLEnvironment>(selectedItem.Tag.ToString(), out var env) ? env : GraphQLEnvironment.Staging;
-                GQLRequest.Environment = _currentEnv;
+                Request.Environment = _currentEnv;
 
                 if (ConfigBorder != null)
                 {
