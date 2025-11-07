@@ -330,6 +330,9 @@ namespace GraphQLClient.Views
 
                 }
 
+                resultsDataGrid.ItemsSource = null;
+                resultsDataGrid.AutoGenerateColumns = true;
+                resultsDataGrid.Columns.Clear();
                 resultsDataGrid.ItemsSource = ElementTable.DefaultView;
                 resultsDataGrid.Items.Refresh();
             }
