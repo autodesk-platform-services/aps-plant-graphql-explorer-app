@@ -1,12 +1,18 @@
 ﻿using GraphQLClient.Commands;
 using GraphQLClient.Data;
 using Microsoft.Win32;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Input;
 
 namespace GraphQLClient.Views
 {
@@ -20,6 +26,13 @@ namespace GraphQLClient.Views
         private readonly string? _folder3dUrn;
         private string? _currentPartTypeUrn;
         private bool _isLoading;
+        private bool _suppressSuggestionRefresh;
+        private readonly ObservableCollection<string> _searchHints = new(Schemas.SchemaList);
+        private readonly ICollectionView _filteredSuggestions;
+        private bool _isSuggestionsOpen;
+        private string _activeToken = string.Empty;
+        private TextPointer? _tokenStartPointer;
+        private TextPointer? _tokenEndPointer;
 
         public bool IsLoading
         {
@@ -33,19 +46,148 @@ namespace GraphQLClient.Views
 
         public DataTable ElementTable { get; } = new DataTable();
         public DataView ElementTableView => ElementTable.DefaultView;
+        public ICollectionView FilteredSuggestions => _filteredSuggestions;
 
         public override ViewTypes ViewType => ViewTypes.Search;
         public override Task LoadData() => LoadSearchResultsAsync();
         public override Task FreshView() => LoadSearchResultsAsync();
 
+        public bool IsSuggestionsOpen
+        {
+            get => _isSuggestionsOpen;
+            set
+            {
+                if (_isSuggestionsOpen != value)
+                {
+                    _isSuggestionsOpen = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public SearchView(AppView appView, BaseView parentView, string projectId, string? folder2dUrn, string? folder3dUrn)
             : base(appView, parentView)
         {
             InitializeComponent();
+            _filteredSuggestions = CollectionViewSource.GetDefaultView(_searchHints);
+            _filteredSuggestions.Filter = FilterSuggestion;
             DataContext = this;
             _projectId = projectId;
             _folder2dUrn = folder2dUrn;
             _folder3dUrn = folder3dUrn;
+        }
+
+        private string GetSearchText()
+        {
+            if (searchTextBox == null)
+            {
+                return string.Empty;
+            }
+
+            var textRange = new TextRange(searchTextBox.Document.ContentStart, searchTextBox.Document.ContentEnd);
+            var text = textRange.Text ?? string.Empty;
+            text = text.Replace("\r\n", " ").Replace('\r', ' ').Replace('\n', ' ');
+            return text.Trim();
+        }
+
+        private void SetSearchText(string text)
+        {
+            if (searchTextBox == null)
+            {
+                return;
+            }
+
+            _suppressSuggestionRefresh = true;
+            try
+            {
+                searchTextBox.Document.Blocks.Clear();
+                var paragraph = new Paragraph(new Run(text))
+                {
+                    Margin = new Thickness(0)
+                };
+                searchTextBox.Document.Blocks.Add(paragraph);
+                var caret = searchTextBox.Document.ContentEnd;
+                caret = caret.GetNextInsertionPosition(LogicalDirection.Backward) ?? caret;
+                searchTextBox.CaretPosition = caret;
+                searchTextBox.Selection.Select(searchTextBox.CaretPosition, searchTextBox.CaretPosition);
+            }
+            finally
+            {
+                _suppressSuggestionRefresh = false;
+            }
+        }
+
+        private static bool IsTokenSeparator(char character)
+        {
+            return char.IsWhiteSpace(character) || character == '.' || character == ':' || character == '-' || character == '_' || character == ',' || character == ';' || character == '/' || character == '\\';
+        }
+
+        private void ResetTokenState()
+        {
+            _activeToken = string.Empty;
+            _tokenStartPointer = null;
+            _tokenEndPointer = null;
+        }
+
+        private string UpdateTokenState()
+        {
+            ResetTokenState();
+
+            if (searchTextBox == null)
+            {
+                return _activeToken;
+            }
+
+            var caret = searchTextBox.CaretPosition;
+            if (caret == null)
+            {
+                return _activeToken;
+            }
+
+            caret = caret.GetInsertionPosition(LogicalDirection.Backward) ?? caret;
+
+            var backwardText = caret.GetTextInRun(LogicalDirection.Backward);
+            var backwardCount = 0;
+            if (!string.IsNullOrEmpty(backwardText))
+            {
+                for (var i = backwardText.Length - 1; i >= 0; i--)
+                {
+                    if (IsTokenSeparator(backwardText[i]))
+                    {
+                        break;
+                    }
+                    backwardCount++;
+                }
+            }
+
+            _tokenStartPointer = caret.GetPositionAtOffset(-backwardCount, LogicalDirection.Backward) ?? caret;
+
+            var forwardText = caret.GetTextInRun(LogicalDirection.Forward);
+            var forwardCount = 0;
+            if (!string.IsNullOrEmpty(forwardText))
+            {
+                for (var i = 0; i < forwardText.Length; i++)
+                {
+                    if (IsTokenSeparator(forwardText[i]))
+                    {
+                        break;
+                    }
+                    forwardCount++;
+                }
+            }
+
+            _tokenEndPointer = caret.GetPositionAtOffset(forwardCount, LogicalDirection.Forward) ?? caret;
+
+            if (_tokenStartPointer == null || _tokenEndPointer == null)
+            {
+                ResetTokenState();
+                return _activeToken;
+            }
+
+            _activeToken = new TextRange(_tokenStartPointer, caret).Text ?? string.Empty;
+            _activeToken = _activeToken.Trim();
+
+            return _activeToken;
         }
 
         private void partTypeCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -90,6 +232,7 @@ namespace GraphQLClient.Views
 
         private async void SearchButton_Click(object sender, RoutedEventArgs e)
         {
+            IsSuggestionsOpen = false;
             await LoadSearchResultsAsync();
         }
 
@@ -128,8 +271,8 @@ namespace GraphQLClient.Views
             try
             {
                 var elementGroupId = await GetGroupElement(_currentPartTypeUrn);
-                var textRange = new TextRange(searchTextBox.Document.ContentStart, searchTextBox.Document.ContentEnd);
-                await SearchDataAsync(elementGroupId, textRange.Text.Trim().Replace("\r\n", " "));
+                var searchTerm = GetSearchText();
+                await SearchDataAsync(elementGroupId, searchTerm);
             }
             finally
             {
@@ -252,6 +395,183 @@ namespace GraphQLClient.Views
 
             var escaped = value.Replace("\"", "\"\"");
             return $"\"{escaped}\"";
+        }
+
+        private void searchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_suppressSuggestionRefresh)
+            {
+                return;
+            }
+
+            RefreshSuggestionView();
+        }
+
+        private void searchTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (suggestionsListBox == null)
+            {
+                return;
+            }
+
+            switch (e.Key)
+            {
+                case Key.Down:
+                    RefreshSuggestionView();
+
+                    if (IsSuggestionsOpen && suggestionsListBox.Items.Count > 0)
+                    {
+                        if (suggestionsListBox.SelectedIndex < 0)
+                        {
+                            suggestionsListBox.SelectedIndex = 0;
+                        }
+
+                        suggestionsListBox.Focus();
+                        e.Handled = true;
+                    }
+                    break;
+
+                case Key.Enter:
+                    if (IsSuggestionsOpen && suggestionsListBox.SelectedItem is string selectedSuggestion)
+                    {
+                        ApplySuggestion(selectedSuggestion);
+                        e.Handled = true;
+                    }
+                    break;
+
+                case Key.Escape:
+                    if (IsSuggestionsOpen)
+                    {
+                        IsSuggestionsOpen = false;
+                        e.Handled = true;
+                    }
+                    break;
+            }
+        }
+
+        private void searchTextBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (e.NewFocus is ListBoxItem or ListBox)
+            {
+                return;
+            }
+
+            IsSuggestionsOpen = false;
+        }
+
+        private void suggestionsListBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (suggestionsListBox.SelectedItem is string selected)
+            {
+                ApplySuggestion(selected);
+                e.Handled = true;
+            }
+        }
+
+        private void suggestionsListBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    if (suggestionsListBox.SelectedItem is string selected)
+                    {
+                        ApplySuggestion(selected);
+                        e.Handled = true;
+                    }
+                    break;
+
+                case Key.Escape:
+                    IsSuggestionsOpen = false;
+                    searchTextBox?.Focus();
+                    e.Handled = true;
+                    break;
+
+                case Key.Up:
+                    if (suggestionsListBox.SelectedIndex <= 0)
+                    {
+                        searchTextBox?.Focus();
+                        e.Handled = true;
+                    }
+                    break;
+            }
+        }
+
+        private bool FilterSuggestion(object suggestion)
+        {
+            if (suggestion is not string text)
+            {
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(_activeToken))
+            {
+                return false;
+            }
+
+            return text.IndexOf(_activeToken, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private void RefreshSuggestionView()
+        {
+            if (suggestionsListBox == null)
+            {
+                return;
+            }
+
+            var token = UpdateTokenState();
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                IsSuggestionsOpen = false;
+                suggestionsListBox.SelectedIndex = -1;
+                _filteredSuggestions.Refresh();
+                return;
+            }
+
+            _filteredSuggestions.Refresh();
+            var hasSuggestions = !_filteredSuggestions.IsEmpty;
+            if (!hasSuggestions)
+            {
+                suggestionsListBox.SelectedIndex = -1;
+            }
+
+            IsSuggestionsOpen = hasSuggestions;
+        }
+
+        private void ApplySuggestion(string suggestion)
+        {
+            if (string.IsNullOrWhiteSpace(suggestion) || searchTextBox == null)
+            {
+                return;
+            }
+
+            if (_tokenStartPointer == null || _tokenEndPointer == null)
+            {
+                UpdateTokenState();
+            }
+
+            _suppressSuggestionRefresh = true;
+            try
+            {
+                if (_tokenStartPointer != null && _tokenEndPointer != null)
+                {
+                    var range = new TextRange(_tokenStartPointer, _tokenEndPointer);
+                    range.Text = suggestion;
+                    searchTextBox.CaretPosition = _tokenStartPointer.GetPositionAtOffset(suggestion.Length, LogicalDirection.Forward) ?? searchTextBox.Document.ContentEnd;
+                    searchTextBox.Selection.Select(searchTextBox.CaretPosition, searchTextBox.CaretPosition);
+                }
+                else
+                {
+                    SetSearchText(suggestion);
+                }
+            }
+            finally
+            {
+                _suppressSuggestionRefresh = false;
+            }
+
+            IsSuggestionsOpen = false;
+            ResetTokenState();
+            searchTextBox.Focus();
         }
     }
 }

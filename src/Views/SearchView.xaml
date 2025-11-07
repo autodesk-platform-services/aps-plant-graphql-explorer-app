@@ -108,8 +108,8 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <RichTextBox x:Name="searchTextBox"
-                 Grid.Column="0"
+            <Grid Grid.Column="0">
+                <RichTextBox x:Name="searchTextBox"
                  Margin="5,0,0,0"
                  FontFamily="Segoe UI"
                  FontSize="13"
@@ -122,17 +122,50 @@
                  HorizontalContentAlignment="Left"
                  HorizontalScrollBarVisibility="Disabled"
                  VerticalScrollBarVisibility="Auto"
-                 SpellCheck.IsEnabled="True">
-                <RichTextBox.Resources>
-                    <Style TargetType="FlowDocument">
-                        <Setter Property="PagePadding" Value="0" />
-                        <Setter Property="LineHeight" Value="3" />
-                    </Style>
-                    <Style TargetType="Paragraph">
-                        <Setter Property="Margin" Value="0" />
-                    </Style>
-                </RichTextBox.Resources>
-            </RichTextBox>
+                 SpellCheck.IsEnabled="True"
+                 TextChanged="searchTextBox_TextChanged"
+                 PreviewKeyDown="searchTextBox_PreviewKeyDown"
+                 LostKeyboardFocus="searchTextBox_LostKeyboardFocus">
+                    <RichTextBox.Resources>
+                        <Style TargetType="FlowDocument">
+                            <Setter Property="PagePadding" Value="0" />
+                            <Setter Property="LineHeight" Value="3" />
+                        </Style>
+                        <Style TargetType="Paragraph">
+                            <Setter Property="Margin" Value="0" />
+                        </Style>
+                    </RichTextBox.Resources>
+                </RichTextBox>
+                <Popup x:Name="suggestionsPopup"
+           PlacementTarget="{Binding ElementName=searchTextBox}"
+           Placement="Bottom"
+           StaysOpen="False"
+           AllowsTransparency="True"
+           IsOpen="{Binding IsSuggestionsOpen, Mode=TwoWay}"
+           PopupAnimation="Fade">
+                    <Border Background="White"
+                BorderBrush="#C6D4F2"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="4"
+                MaxHeight="220"
+                SnapsToDevicePixels="True">
+                        <ListBox x:Name="suggestionsListBox"
+                     ItemsSource="{Binding FilteredSuggestions}"
+                     Width="{Binding Source={x:Reference searchTextBox}, Path=ActualWidth}"
+                     MaxHeight="200"
+                     MouseLeftButtonUp="suggestionsListBox_PreviewMouseLeftButtonUp"
+                     PreviewKeyDown="suggestionsListBox_PreviewKeyDown">
+                            <ListBox.Resources>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="8,4" />
+                                </Style>
+                            </ListBox.Resources>
+                        </ListBox>
+                    </Border>
+                </Popup>
+            </Grid>
+
             <StackPanel Grid.Column="1" Margin="5, 0, 5, 0">
                 <ComboBox x:Name="partTypeCombobox"
                       Grid.Row="0"
