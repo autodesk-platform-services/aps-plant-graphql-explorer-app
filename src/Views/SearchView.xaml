@@ -231,6 +231,8 @@
 
         <Border Grid.RowSpan="2"
                 Background="#99000000"
+                Height="50"
+                Width="200"
                 Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
                 IsHitTestVisible="True">
             <StackPanel HorizontalAlignment="Center"

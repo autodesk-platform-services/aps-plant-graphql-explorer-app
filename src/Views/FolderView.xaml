@@ -16,14 +16,51 @@
                   MouseDoubleClick="folders_MouseDoubleClick">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding Name}" Tag="{Binding Id}" FontSize="14"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Path Width="12"
+                              Height="12"
+                              Stroke="#2F855A"
+                              StrokeThickness="2"
+                              StrokeLineJoin="Round"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              Data="M1,6 L4,9 9,1"
+                              Margin="0,0,6,0">
+                            <Path.Style>
+                                <Style TargetType="Path">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlantProject}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Path.Style>
+                        </Path>
+                        <Path Width="12"
+                              Height="12"
+                              Margin="0,0,6,0">
+                            <Path.Style>
+                                <Style TargetType="Path">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlantProject}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Path.Style>
+                        </Path>
+                        <TextBlock Text="{Binding Name}" Tag="{Binding Id}" FontSize="14"/>
+                    </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
 
         <Border Grid.RowSpan="2"
                 Background="#99000000"
-                Height="450"
+                Height="50"
+                Width="200"
                 Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
                 IsHitTestVisible="True">
             <StackPanel HorizontalAlignment="Center"
