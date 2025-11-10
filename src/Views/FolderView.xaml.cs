@@ -41,7 +41,11 @@ namespace GraphQLClient.Views
 
         public override ViewTypes ViewType => ViewTypes.Folder;
         public override Task LoadData() => LoadFoldersAsync();
-        public override Task FreshView() => LoadFoldersAsync();
+        public override Task FreshView()
+        {
+            _folders.Clear();
+            return LoadFoldersAsync();
+        }
 
         public ObservableCollection<Folder> _folders { get; set; } = new ObservableCollection<Folder>();
         public ObservableCollection<Folder> Folders
@@ -89,30 +93,38 @@ namespace GraphQLClient.Views
                 }
                 else
                 {
-                    var request = GQLRequest.Instance;
-                    dynamic? response = string.IsNullOrEmpty(_folderUrn) ?
-                        await request.QueryAsync<GraphQLResponse<ProjectFolderData>>(QueryCommands.Query_FolderByProject, new { projectId = _projectId }) :
-                        await request.QueryAsync<GraphQLResponse<ProjectFolderByFolderData>>(QueryCommands.Query_SpecialFolder, new { projectId = _projectId, folderId = _folderUrn });
-
-                    var folders = response.Data.Folders.Results as IEnumerable<Folder>;
-                    if (folders == null)
-                    {
-                        return;
-                    }
-
-                    await CheckPlantProjectFoldersAsync(folders);
-
                     if (current == null)
                     {
-                        Folders.Clear();
-                        foreach (var folder in folders)
+                        var response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<ProjectFolderData>>
+                        (
+                            QueryCommands.Query_FolderByProject, new { projectId = _projectId }
+                        );
+
+                        var folders = response.Data.Folders.Results as IEnumerable<Folder>;
+                        if (folders != null)
                         {
-                            Folders.Add(folder);
+                            await CheckPlantProjectFoldersAsync(folders);
+
+                            Folders.Clear();
+                            foreach (var folder in folders)
+                            {
+                                Folders.Add(folder);
+                            }
                         }
                     }
                     else
                     {
-                        current.Children = new List<Folder>(folders);
+                        var response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<ProjectFolderByFolderData>>
+                        (
+                            QueryCommands.Query_SpecialFolder, new { projectId = _projectId, folderId = current.Id }
+                        );
+
+                        var folders = response.Data.Folders.Results as IEnumerable<Folder>;
+                        if (folders != null)
+                        {
+                            await CheckPlantProjectFoldersAsync(folders);
+                            current.Children = new List<Folder>(folders);
+                        }
                     }
                 }
             }
@@ -150,7 +162,8 @@ namespace GraphQLClient.Views
                 var requestBody = new
                 {
                     folderUrns = new string[] { folder.Id },
-                    searchText = "PipingPart.xml"
+                    searchText = "PipingPart.xml",
+                    recursive = false
                 };
                 var query = JsonSerializer.Serialize(requestBody);
                 try
@@ -208,11 +221,11 @@ namespace GraphQLClient.Views
             {
                 if (string.Compare(doc.Name, "P&ID Data Set", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    result.Item1 = folder.Id;
+                    result.Item1 = doc.ParentFolderUrn;
                 }
                 else if (string.Compare(doc.Name, "3D Piping Data Set", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    result.Item2 = folder.Id;
+                    result.Item2 = doc.ParentFolderUrn;
                 }
             }
 

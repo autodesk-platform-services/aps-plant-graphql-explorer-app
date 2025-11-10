@@ -19,7 +19,7 @@ namespace GraphQLClient.Commands
 
         public static DocsRequest Instance => _instance.Value;
 
-        public override async Task<T> QueryAsync<T>(string query, object? variables = null, CancellationToken cancellationToken = default)
+        public override async Task<T> QueryAsync<T>(string query, dynamic? variables = null, CancellationToken cancellationToken = default)
         {
             var token = await TokenService.RequestTokenAsync(cancellationToken).ConfigureAwait(false);
 
@@ -28,7 +28,7 @@ namespace GraphQLClient.Commands
                 throw new ArgumentNullException(nameof(variables), "Project ID must be provided in variables.");
             }
 
-            var projectId = variables.ToString();
+            var projectId = variables as string;
             var baseUrl = string.Format(BaseUrl, projectId.Substring(projectId.IndexOf('.') + 1));
             using var message = new HttpRequestMessage(HttpMethod.Post, baseUrl)
             {
