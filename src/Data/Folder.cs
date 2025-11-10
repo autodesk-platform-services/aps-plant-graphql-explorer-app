@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
@@ -39,12 +40,58 @@ namespace GraphQLClient.Data
             }
         }
 
+        private bool _isPlantProject;
         [JsonIgnore]
-        public bool IsPlantProject { get; set; }
+        public bool IsPlantProject
+        {
+            get => _isPlantProject;
+            set
+            {
+                if (_isPlantProject != value)
+                {
+                    _isPlantProject = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _pipingDataset = string.Empty;
         [JsonIgnore]
-        public string PipingDataset { get; set; }
+        public string PipingDataset
+        {
+            get => _pipingDataset;
+            set
+            {
+                if (!string.Equals(_pipingDataset, value, StringComparison.Ordinal))
+                {
+                    _pipingDataset = value ?? string.Empty;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(HasPipingDataset));
+                }
+            }
+        }
+
+        private string _pidDataset = string.Empty;
         [JsonIgnore]
-        public string PIDDataset { get; set; }
+        public string PIDDataset
+        {
+            get => _pidDataset;
+            set
+            {
+                if (!string.Equals(_pidDataset, value, StringComparison.Ordinal))
+                {
+                    _pidDataset = value ?? string.Empty;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(HasPIDDataset));
+                }
+            }
+        }
+
+        [JsonIgnore]
+        public bool HasPipingDataset => !string.IsNullOrWhiteSpace(_pipingDataset);
+
+        [JsonIgnore]
+        public bool HasPIDDataset => !string.IsNullOrWhiteSpace(_pidDataset);
 
         [JsonPropertyName("parentFolder")]
         public FolderReference? ParentFolder { get; set; }

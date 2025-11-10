@@ -71,15 +71,6 @@ namespace GraphQLClient.Views
                 IsLoading = true;
                 if (current != null && current.IsPlantProject)
                 {
-                    if (string.IsNullOrEmpty(current.PIDDataset) || string.IsNullOrEmpty(current.PipingDataset))
-                    {
-                        // get dataset urns
-                        //
-                        var (pidUrn, p3dUrn) = await GetPlantFilePulsFolderUrns(current);
-                        current.PIDDataset = pidUrn;
-                        current.PipingDataset = p3dUrn;
-                    }
-
                     if (current.PIDDataset != null || current.PipingDataset != null)
                     {
                         // show earch view
@@ -101,6 +92,18 @@ namespace GraphQLClient.Views
                     }
 
                     await CheckPlantProjectFoldersAsync(folders);
+
+                    foreach (var folder in folders.Where(c => c.IsPlantProject))
+                    {
+                        if (string.IsNullOrEmpty(folder.PIDDataset) || string.IsNullOrEmpty(folder.PipingDataset))
+                        {
+                            // get dataset urns
+                            //
+                            var (pidUrn, p3dUrn) = await GetPlantFilePulsFolderUrns(folder);
+                            folder.PIDDataset = pidUrn;
+                            folder.PipingDataset = p3dUrn;
+                        }
+                    }
 
                     if (current == null)
                     {
