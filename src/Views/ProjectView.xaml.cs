@@ -37,7 +37,11 @@ namespace GraphQLClient.Views
 
         public override ViewTypes ViewType => ViewTypes.Projects;
         public override Task LoadData() => LoadProjectsAsync();
-        public override Task FreshView() => LoadProjectsAsync();
+        public override Task FreshView()
+        {
+            _projects.Clear();
+            return LoadProjectsAsync();
+        }
 
         public ObservableCollection<Project> _projects { get; set; } = new ObservableCollection<Project>();
         public ObservableCollection<Project> Projects
