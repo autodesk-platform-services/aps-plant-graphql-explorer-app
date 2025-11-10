@@ -96,6 +96,14 @@ namespace GraphQLClient.Views
                         {
                             await CheckPlantProjectFoldersAsync(folders);
 
+                            var tasks = folders.Where(c => c.IsPlantProject).Select(async c =>
+                            {
+                                var (pidUrn, p3dUrn) = await GetPlantFilePulsFolderUrns(c);
+                                c.PIDDataset = pidUrn;
+                                c.PipingDataset = p3dUrn;
+                            });
+                            await Task.WhenAll(tasks);
+
                             Folders.Clear();
                             foreach (var folder in folders)
                             {
