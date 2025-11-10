@@ -15,5 +15,8 @@ namespace GraphQLClient.Data
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
+
+        [JsonPropertyName("parentFolderUrn")]
+        public string ParentFolderUrn { get; set; }
     }
 }
