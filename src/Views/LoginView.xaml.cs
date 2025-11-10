@@ -136,6 +136,8 @@ namespace GraphQLClient.Views
             {
                 _currentOAuthType = OAuthType.OAuth_PKCE;
             }
+
+            SetClientConfiguration(_currentEnv);
         }
     }
 }
