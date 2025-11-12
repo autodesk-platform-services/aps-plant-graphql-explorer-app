@@ -161,26 +161,70 @@ namespace GraphQLClient.Services
         {
             var pkce = CreatePkceData(oAuthType == OAuthType.OAuth_PKCE);
             var authorizeUrl = BuildAuthorizeUrl(pkce);
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var waitForCodeTask = WaitForAuthorizationCodeAsync(listener, pkce, linkedCts.Token);
 
-            //Process.Start(new ProcessStartInfo(authorizeUrl) { UseShellExecute = true });
-            await Application.Current.Dispatcher.InvokeAsync(() =>
+            bool? dialogResult = await Application.Current.Dispatcher.InvokeAsync<bool?>(() =>
             {
                 var dialog = new OAuthWindow(new Uri(authorizeUrl), RedirectUri)
                 {
                     Owner = Application.Current.MainWindow
                 };
-                dialog.Show();
+
+                dialog.Closed += (_, __) =>
+                {
+                    if (dialog.DialogResult == true)
+                    {
+                        return;
+                    }
+
+                    if (!linkedCts.IsCancellationRequested)
+                    {
+                        linkedCts.Cancel();
+                    }
+
+                    try
+                    {
+                        listener.Stop();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                    }
+                    catch (HttpListenerException)
+                    {
+                    }
+                };
+
+                return dialog.ShowDialog();
             });
+
+            if (dialogResult != true || !linkedCts.IsCancellationRequested)
+            {
+                linkedCts.Cancel();
+            }
 
             try
             {
-                var code = await WaitForAuthorizationCodeAsync(listener, pkce, cancellationToken).ConfigureAwait(false);
+                var code = await WaitForAuthorizationCodeAsync(listener, pkce, linkedCts.Token).ConfigureAwait(false);
                 var result = await RedeemAuthorizationCodeAsync(code, pkce, cancellationToken).ConfigureAwait(false);
                 CacheToken(result);
             }
+            catch (OperationCanceledException) when (linkedCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+            {
+                throw new OperationCanceledException("OAuth login was cancelled by the user.", cancellationToken);
+            }
             finally
             {
-                listener.Stop();
+                try
+                {
+                    listener.Stop();
+                }
+                catch (ObjectDisposedException)
+                {
+                }
+                catch (HttpListenerException)
+                {
+                }
             }
         }
 
@@ -250,7 +294,23 @@ namespace GraphQLClient.Services
         {
             while (true)
             {
-                var context = await listener.GetContextAsync().ConfigureAwait(false);
+                HttpListenerContext context;
+                try
+                {
+                    context = await listener.GetContextAsync().ConfigureAwait(false);
+                }
+                catch (HttpListenerException) when (cancellationToken.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException(cancellationToken);
+                }
+                catch (InvalidOperationException) when (cancellationToken.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException(cancellationToken);
+                }
+                catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException(cancellationToken);
+                }
 
                 if (cancellationToken.IsCancellationRequested)
                 {

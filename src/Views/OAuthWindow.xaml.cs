@@ -31,7 +31,7 @@ namespace GraphQLClient.Views
             {
                 if (e.Uri.StartsWith(redirectUri.AbsoluteUri, StringComparison.OrdinalIgnoreCase))
                 {
-                    Dispatcher.BeginInvoke(Close);
+                    Dispatcher.BeginInvoke(() => DialogResult = true);
                 }
             };
         }
