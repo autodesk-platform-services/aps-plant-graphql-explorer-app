@@ -162,7 +162,6 @@ namespace GraphQLClient.Services
             var pkce = CreatePkceData(oAuthType == OAuthType.OAuth_PKCE);
             var authorizeUrl = BuildAuthorizeUrl(pkce);
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            var waitForCodeTask = WaitForAuthorizationCodeAsync(listener, pkce, linkedCts.Token);
 
             bool? dialogResult = await Application.Current.Dispatcher.InvokeAsync<bool?>(() =>
             {
@@ -197,11 +196,6 @@ namespace GraphQLClient.Services
 
                 return dialog.ShowDialog();
             });
-
-            if (dialogResult != true || !linkedCts.IsCancellationRequested)
-            {
-                linkedCts.Cancel();
-            }
 
             try
             {
