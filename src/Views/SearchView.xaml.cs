@@ -289,6 +289,7 @@ namespace GraphQLClient.Views
 
                 var response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<SearchData>>(QueryCommands.Query_SearchElements,
                     new { groupId = elementGroupId, filter = new { query = searchTerm } });
+                string previousCursor = string.Empty;
                 while (true)
                 {
                     var cursor = response?.Data?.ElementWraps?.Pagination?.Cursor;
@@ -320,10 +321,12 @@ namespace GraphQLClient.Views
                         }
                     }
 
-                    if (cursor == null)
+                    if (string.IsNullOrEmpty(cursor) || string.Compare(cursor, previousCursor, StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         break;
                     }
+
+                    previousCursor = cursor;
 
                     response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<SearchData>>(QueryCommands.Query_SearchElements,
                         new { groupId = elementGroupId, filter = new { query = searchTerm }, pagination = new { cursor = cursor } });

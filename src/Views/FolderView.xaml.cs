@@ -122,6 +122,14 @@ namespace GraphQLClient.Views
                         if (folders != null)
                         {
                             await CheckPlantProjectFoldersAsync(folders);
+                            var tasks = folders.Where(c => c.IsPlantProject).Select(async c =>
+                            {
+                                var (pidUrn, p3dUrn) = await GetPlantFilePulsFolderUrns(c);
+                                c.PIDDataset = pidUrn;
+                                c.PipingDataset = p3dUrn;
+                            });
+                            await Task.WhenAll(tasks);
+
                             current.Children = new List<Folder>(folders);
                         }
                     }

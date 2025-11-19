@@ -172,9 +172,10 @@
                       HorizontalAlignment="Right"
                       Width="100" Height="25"
                       SelectionChanged="partTypeCombobox_SelectionChanged" 
+                      HorizontalContentAlignment="Center"
                       SelectedIndex="-1">
-                    <ComboBoxItem Content="ProcessPower" />
-                    <ComboBoxItem Content="Piping" />
+                    <ComboBoxItem Content="ProcessPower"/>
+                    <ComboBoxItem Content="Piping"/>
                 </ComboBox>
                 <Button Grid.Row="1" 
                         Margin="5,5,0,0" 
