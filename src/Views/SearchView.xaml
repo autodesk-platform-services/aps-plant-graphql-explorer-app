@@ -251,7 +251,7 @@
                         <Button
                         Grid.Row="2"
                         Margin="10, 0, 10, 10" 
-                        Content="Search" 
+                        Content="Run" 
                         HorizontalAlignment="Right"
                         Width="100" Height="25" 
                         Click="SearchButton_Click" />

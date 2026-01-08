@@ -6,11 +6,11 @@
         xmlns:views="clr-namespace:GraphQLClient.Views"
         mc:Ignorable="d"
         Title="GraphQL Client"
-        Height="600" Width="1000"
+        Height="700" Width="1000"
         MinHeight="100" MinWidth="300"
         Icon="/Resources/launch.ico"
         WindowStartupLocation="CenterScreen"
-        SizeToContent="Height"
+        SizeToContent="Manual"
         Loaded="Window_Loaded">
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
