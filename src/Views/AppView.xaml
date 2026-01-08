@@ -11,7 +11,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid KeyboardNavigation.TabNavigation="Cycle">
+    <Grid KeyboardNavigation.TabNavigation="Cycle" HorizontalAlignment="Stretch" VerticalAlignment="Center">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>

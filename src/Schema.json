@@ -1,0 +1,342 @@
+﻿{
+  "prefix": "property.id.autodesk.plant3d.parameter",
+  "version": "1.0.0",
+  "schemas": [
+    {
+      "groupName": "Identification, Naming & Classification",
+      "data": [
+        "name",
+        "displayName",
+        "title",
+        "description",
+        "shortDescription",
+        "categoryName",
+        "className",
+        "rowClassName",
+        "type",
+        "contentType",
+        "partCategory",
+        "partSubType",
+        "bodyType",
+        "componentDesignation",
+        "itemCode",
+        "code",
+        "tag",
+        "tagRegistyName"
+      ]
+    },
+    {
+      "groupName": "Project & Client Metadata",
+      "data": [
+        "projectId",
+        "projectName",
+        "projectNumber",
+        "projectPart",
+        "projectStandard",
+        "projectDescription",
+        "clientInformationCompanyName",
+        "clientInformationPrimaryContact",
+        "projectDataAddress",
+        "projectDataCity",
+        "projectDataState",
+        "projectDataCountry",
+        "projectDataPostalCode",
+        "projectDataZip",
+        "projectDataTelephone",
+        "projectDataProjectManager"
+      ]
+    },
+    {
+      "groupName": "Document, Drawing & P&ID References",
+      "data": [
+        "dwgId",
+        "dwgName",
+        "dwgGuid",
+        "dwgSubIndex",
+        "dwgHandleHigh",
+        "dwgHandleLow",
+        "pnid",
+        "pnpId",
+        "pnpGuid",
+        "pnpParentGuid",
+        "pnpDrawingGuid",
+        "pnpClassName",
+        "pnpType",
+        "pnpStatus",
+        "pnpRevision",
+        "pnpTimestamp",
+        "pnpTimestampGuid",
+        "pnpDwgOutOfSync"
+      ]
+    },
+    {
+      "groupName": "Geometry, Position & Orientation",
+      "data": [
+        "positionX",
+        "positionY",
+        "positionZ",
+        "startX",
+        "startY",
+        "startZ",
+        "endX",
+        "endY",
+        "endZ",
+        "xAxis",
+        "cosX",
+        "cosY",
+        "cosZ",
+        "normal",
+        "path",
+        "pathAngle",
+        "curveRadius",
+        "eccentricity",
+        "offset",
+        "justification"
+      ]
+    },
+    {
+      "groupName": "Dimensions & Size",
+      "data": [
+        "length",
+        "minLength",
+        "maxLength",
+        "cutLength",
+        "minCutLength",
+        "useFixedLength",
+        "diameter",
+        "nominalDiameter",
+        "nominalSize",
+        "nominalUnit",
+        "wallThickness",
+        "width",
+        "height",
+        "size",
+        "size2",
+        "shapeSize",
+        "flangeThickness",
+        "flangeOffset",
+        "engagementLength"
+      ]
+    },
+    {
+      "groupName": "Weight, Area & Volume",
+      "data": [
+        "weight",
+        "weightUnit",
+        "linearWeight",
+        "linearWeightUnit",
+        "area",
+        "surfaceArea",
+        "transferArea",
+        "areaWeight",
+        "areaWeightUnit",
+        "volume"
+      ]
+    },
+    {
+      "groupName": "Material & Specification",
+      "data": [
+        "material",
+        "materialCode",
+        "materialStandard",
+        "materialOfConstruction",
+        "materialOfConstructionShell",
+        "materialOfConstructionTube",
+        "spec",
+        "specPart",
+        "specPartGuid",
+        "specRecordId",
+        "requiredSpec",
+        "gasketStd",
+        "flangeStd",
+        "compatibleStandard",
+        "boltCompatibleStd"
+      ]
+    },
+    {
+      "groupName": "Pressure, Temperature & Process Design",
+      "data": [
+        "designPressure",
+        "designPressureFactor",
+        "operatingPressure",
+        "testPressure",
+        "shellDesignPressure",
+        "tubeDesignPressure",
+        "designTemperature",
+        "operatingTemperature",
+        "shellDesignTemperature",
+        "tubeDesignTemperature",
+        "pressureClass",
+        "postWeldHeatTreatment",
+        "testingFluid"
+      ]
+    },
+    {
+      "groupName": "Flow, Performance & Duty",
+      "data": [
+        "flowRate",
+        "flowCapacity",
+        "flowDependent",
+        "capacity",
+        "efficiency",
+        "duty",
+        "totalDynamicHead",
+        "speed",
+        "frequency",
+        "power",
+        "powerRating",
+        "voltage"
+      ]
+    },
+    {
+      "groupName": "Valve, Actuator & Control",
+      "data": [
+        "valveCode",
+        "valveDetail",
+        "valveBodyType",
+        "valveAlignment",
+        "controlValve",
+        "actuatorType",
+        "actuatorHeight",
+        "actuatorWidth",
+        "operatorType",
+        "setPoint",
+        "setPointType",
+        "trim",
+        "trimShell",
+        "trimTube"
+      ]
+    },
+    {
+      "groupName": "Piping, Connections & Supports",
+      "data": [
+        "endType",
+        "endConnections",
+        "jointType",
+        "portName",
+        "connectorNumber",
+        "connectionPortCount",
+        "branchAngle1",
+        "branchAngle2",
+        "matchingPipeOd",
+        "pipeSupportsLayerTemplate",
+        "supportType",
+        "supportDetail",
+        "spoolNumber",
+        "weldNumber",
+        "tieInNumber"
+      ]
+    },
+    {
+      "groupName": "Insulation, Tracing & Coating",
+      "data": [
+        "insulation",
+        "insulationSpec",
+        "insulationThickness",
+        "insulationType",
+        "tracing",
+        "tracingSpec",
+        "tracingType",
+        "paintCode"
+      ]
+    },
+    {
+      "groupName": "Line, Loop & Service Data",
+      "data": [
+        "lineNumber",
+        "lineNumberTag",
+        "service",
+        "loopNumber",
+        "originOrDestination",
+        "destinationLineServiceCode",
+        "from",
+        "to",
+        "fromHeight",
+        "toHeight"
+      ]
+    },
+    {
+      "groupName": "Catalogs, Picklists & Tables",
+      "data": [
+        "picklistId",
+        "picklistName",
+        "picklistType",
+        "picklistValue",
+        "picklistValueDescription",
+        "tableName",
+        "propertyTableName",
+        "columnID",
+        "columnName",
+        "rowId",
+        "number",
+        "numberInSet",
+        "numberOfTrays"
+      ]
+    },
+    {
+      "groupName": "Styling, Layers & Visualization",
+      "data": [
+        "colorBy",
+        "colorValue",
+        "acCmColVal",
+        "transparencyValue",
+        "automateLayerColor",
+        "layerBy",
+        "currentStyle",
+        "currentScheme",
+        "schemeName",
+        "styleName",
+        "styleDecription",
+        "scale"
+      ]
+    },
+    {
+      "groupName": "Lifecycle, Versioning & Status",
+      "data": [
+        "version",
+        "originalVersion",
+        "revision",
+        "status",
+        "phase",
+        "startDate",
+        "enddate",
+        "author",
+        "historyGuid"
+      ]
+    },
+    {
+      "groupName": "Locking, State & Control Flags",
+      "data": [
+        "locked",
+        "lockedBy",
+        "lockedTimestamp",
+        "fixed",
+        "failure",
+        "flagValue",
+        "isReadOnly",
+        "isShared",
+        "isSelectionList",
+        "needUpdateAll"
+      ]
+    },
+    {
+      "groupName": "Miscellaneous / System / Data Links",
+      "data": [
+        "dataLinksId",
+        "repositoryId",
+        "projectDataProjectNumber",
+        "parameter.category",
+        "paramOnLine",
+        "propVal",
+        "propValue",
+        "value",
+        "unit",
+        "delimiter",
+        "reference",
+        "location",
+        "notes",
+        "miscellaneous_Diameter"
+      ]
+    }
+  ]
+}

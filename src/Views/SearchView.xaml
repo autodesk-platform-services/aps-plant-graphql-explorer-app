@@ -96,6 +96,8 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <CollectionViewSource x:Key="schemaGroups" Source="{Binding SchemaGroups}" />
     </local:BaseView.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -116,7 +118,7 @@
 
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200" x:Name="leftColumn" />
+                    <ColumnDefinition Width="230" x:Name="leftColumn" />
                     <ColumnDefinition Width="50"/>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
@@ -127,17 +129,32 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <ComboBox Name="referenceCombobox" Grid.Row="0"
-                           Margin="10">
-                            <ComboBoxItem Content="Reference 1" />
-                            <ComboBoxItem Content="Reference 2" />
-                            <ComboBoxItem Content="Reference 3" />
-                     </ComboBox>
+                    <ComboBox x:Name="referenceCombobox" 
+                              Grid.Row="0"
+                              SelectedIndex="-1"
+                              Margin="10"
+                              SelectionChanged="referenceCombobox_SelectionChanged">
+                        <ComboBox.ItemsSource>
+                            <CompositeCollection>
+                                <ComboBoxItem Content="All"/>
+                                <Separator/>
+                                <CollectionContainer Collection="{Binding Source={StaticResource schemaGroups}}"/>
+                                <Separator/>
+                                <ComboBoxItem Content="Examples"/>
+                            </CompositeCollection>
+                        </ComboBox.ItemsSource>
+                    </ComboBox>
 
 
                     <ListBox x:Name="schemaList" Grid.Row="1"
                          VerticalAlignment="Stretch"
-                         Margin="10,0,10,10" />
+                         Margin="10,0,10,10">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <EventSetter Event="MouseDoubleClick" Handler="SchemaList_MouseDoubleClick"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
                 </Grid>
 
                 <Grid Grid.Column="2">
@@ -162,14 +179,14 @@
                             <TextBlock Text="Query:" Margin="10" FontSize="12" Grid.Column="0"/>
                             <TextBlock Text="Scope:" Margin="10" FontSize="12" Grid.Column="1"/>
                             <ComboBox x:Name="partTypeCombobox"
-                          Grid.Column="2"
-                          HorizontalAlignment="Right"
-                          Width="100" Height="25" Margin="10"
-                          SelectionChanged="partTypeCombobox_SelectionChanged" 
-                          HorizontalContentAlignment="Center"
-                          SelectedIndex="-1">
-                                <ComboBoxItem Content="ProcessPower"/>
-                                <ComboBoxItem Content="Piping"/>
+                                  Grid.Column="2"
+                                  HorizontalAlignment="Right"
+                                  Width="100" Height="25" Margin="10"
+                                  SelectionChanged="partTypeCombobox_SelectionChanged" 
+                                  HorizontalContentAlignment="Center"
+                                  SelectedIndex="0">
+                                    <ComboBoxItem Content="3D Model"/>
+                                    <ComboBoxItem Content="PnId Model"/>
                             </ComboBox>
                         </Grid>
 
@@ -178,6 +195,7 @@
                           Margin="10, 0, 10, 10"
                           FontFamily="Segoe UI"
                           FontSize="13"
+                          MinHeight="50"
                           Foreground="#1F2937"
                           Background="#F9FBFF"
                           BorderBrush="#C6D4F2"
@@ -241,11 +259,11 @@
 
                     <Grid Grid.Row="1">
                         <Border Grid.Row="1"
-                        Margin="10, 20, 10, 10"
-                        Background="White">
-
+                            Margin="10, 20, 10, 10"
+                            Background="White">
                             <DataGrid x:Name="resultsDataGrid"
                               Margin="0"
+                              MinHeight="200"
                               AutoGenerateColumns="True"
                               AlternationCount="2"
                               HeadersVisibility="Column"
@@ -272,11 +290,11 @@
                         </Border>
 
                         <Border Grid.Row="1"
-                        Background="#99000000"
-                        Height="50"
-                        Width="200"
-                        Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
-                        IsHitTestVisible="True">
+                            Background="#99000000"
+                            Height="50"
+                            Width="200"
+                            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
+                            IsHitTestVisible="True">
                             <StackPanel HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Width="220"
@@ -300,7 +318,8 @@
                 <Button Content="&lt;&lt; Choose project"
                     Margin="10"
                     HorizontalAlignment="Left"
-                    Width="150" Height="25"/>
+                    Width="150" Height="25"
+                    Click="ChooseProject_Click"/>
                 <Button 
                     Margin="10" 
                     Content="Export CSV"

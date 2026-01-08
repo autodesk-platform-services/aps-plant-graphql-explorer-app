@@ -6,7 +6,7 @@
         xmlns:views="clr-namespace:GraphQLClient.Views"
         mc:Ignorable="d"
         Title="GraphQL Client"
-        Height="400" Width="800"
+        Height="600" Width="1000"
         MinHeight="100" MinWidth="300"
         Icon="/Resources/launch.ico"
         WindowStartupLocation="CenterScreen"
@@ -14,7 +14,7 @@
         Loaded="Window_Loaded">
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Border Grid.Row="0" Margin="24,24,24,24"
                 Padding="28"
@@ -23,7 +23,7 @@
                 BorderBrush="#FFDFE3E8"
                 BorderThickness="1">
             <Grid>
-                <views:LoginView x:Name="LoginViewControl" Visibility="Visible" />
+                <views:LoginView x:Name="LoginViewControl" Visibility="Visible" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
             </Grid>
         </Border>
     </Grid>

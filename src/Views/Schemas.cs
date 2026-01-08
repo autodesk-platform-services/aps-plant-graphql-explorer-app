@@ -11,7 +11,6 @@ namespace GraphQLClient.Views
 {
     public static class Schemas
     {
-
         public static string[] SchemaList = new string[]
         {
             "property.id.autodesk.plant3d.parameter:acCmColVal-1.0.0",

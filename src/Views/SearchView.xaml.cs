@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,6 +35,7 @@ namespace GraphQLClient.Views
         private string _activeToken = string.Empty;
         private TextPointer? _tokenStartPointer;
         private TextPointer? _tokenEndPointer;
+        private SchemaObject _schemaObject;
 
         public bool IsLoading
         {
@@ -47,10 +50,11 @@ namespace GraphQLClient.Views
         public DataTable ElementTable { get; } = new DataTable();
         public DataView ElementTableView => ElementTable.DefaultView;
         public ICollectionView FilteredSuggestions => _filteredSuggestions;
+        public List<string> SchemaGroups { get; set; }
 
         public override ViewTypes ViewType => ViewTypes.Search;
-        public override Task LoadData() => LoadSearchResultsAsync();
-        public override Task FreshView() => LoadSearchResultsAsync();
+        //public override Task LoadData() => LoadSearchResultsAsync();
+        //public override Task FreshView() => LoadSearchResultsAsync();
 
         public bool IsSuggestionsOpen
         {
@@ -69,12 +73,23 @@ namespace GraphQLClient.Views
             : base(appView, parentView)
         {
             InitializeComponent();
+
+            var uri = new Uri("pack://application:,,,/Schema.json");
+            var resourceStream = Application.GetResourceStream(uri);
+            using (var reader = new StreamReader(resourceStream.Stream))
+            {
+                var jsonString = reader.ReadToEnd();
+                _schemaObject = JsonSerializer.Deserialize<SchemaObject>(jsonString);
+            }
+            SchemaGroups = _schemaObject.Data.Select(c => c.GroupName).ToList();
+
             _filteredSuggestions = CollectionViewSource.GetDefaultView(_searchHints);
             _filteredSuggestions.Filter = FilterSuggestion;
             DataContext = this;
             _projectId = projectId;
             _folder2dUrn = folder2dUrn;
             _folder3dUrn = folder3dUrn;
+            referenceCombobox.SelectedIndex = 0;
         }
 
         private string GetSearchText()
@@ -195,7 +210,7 @@ namespace GraphQLClient.Views
             if (e.AddedItems.Count > 0)
             {
                 var selectedPartType = (e.AddedItems[0] as ComboBoxItem)?.Content?.ToString();
-                _currentPartTypeUrn = string.Compare(selectedPartType, "Piping", StringComparison.OrdinalIgnoreCase) == 0 ? _folder3dUrn : _folder2dUrn;
+                _currentPartTypeUrn = string.Compare(selectedPartType, "3D Model", StringComparison.OrdinalIgnoreCase) == 0 ? _folder3dUrn : _folder2dUrn;
             }
         }
 
@@ -578,6 +593,69 @@ namespace GraphQLClient.Views
             IsSuggestionsOpen = false;
             ResetTokenState();
             searchTextBox.Focus();
+        }
+
+        private void ChooseProject_Click(object sender, RoutedEventArgs e)
+        {
+            if (ParentView != null)
+            {
+                _appView.SetView(ParentView);
+            }
+        }
+
+        private void referenceCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (schemaList == null || referenceCombobox == null)
+            {
+                return;
+            }
+
+            schemaList.ItemsSource = null;
+
+            var selectedValue = referenceCombobox.SelectedItem switch
+            {
+                ComboBoxItem cbi => cbi.Content?.ToString() ?? string.Empty,
+                string str => str,
+                _ => string.Empty
+            };
+            if (string.Compare(selectedValue, "All", StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                _currentPartTypeUrn = _folder2dUrn;
+                var data = _schemaObject.Data.SelectMany(c => c.SchemaList).ToList();
+                if (data != null && data.Count > 0)
+                {
+                    data.Sort(StringComparer.OrdinalIgnoreCase);
+                    schemaList.ItemsSource = data;
+                }
+            }
+            else if (string.Compare(selectedValue, "Examples", StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                _currentPartTypeUrn = _folder3dUrn;
+            }
+            else
+            {
+                var data = _schemaObject.Data.FirstOrDefault(c => string.Compare(c.GroupName, selectedValue, StringComparison.OrdinalIgnoreCase) == 0);
+                if (data != null && data.SchemaList.Count > 0)
+                {
+                    data.SchemaList.Sort(StringComparer.OrdinalIgnoreCase);
+                    schemaList.ItemsSource = data.SchemaList;
+                }
+            }
+        }
+
+        private string GetFullSchemaParameter(string schemaName) => $"{_schemaObject.Prefix}:{schemaName}-{_schemaObject.Version}";
+
+        private void SchemaList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var item = ((ListBoxItem)sender).Content;
+            var lastBlock = searchTextBox.Document.Blocks.LastBlock as Paragraph;
+            if (lastBlock == null)
+            {
+                lastBlock = new Paragraph();
+                searchTextBox.Document.Blocks.Add(lastBlock);
+            }
+
+            lastBlock.Inlines.Add(new Run(GetFullSchemaParameter(item.ToString())));
         }
     }
 }
