@@ -25,8 +25,8 @@ namespace GraphQLClient.Views
         protected AppView _appView;
 
         public virtual ViewTypes ViewType => ViewTypes.None;
-        public virtual Task LoadData() => throw new NotImplementedException();
-        public virtual Task FreshView() => throw new NotImplementedException();
+        public virtual Task LoadData() => Task.CompletedTask;
+        public virtual Task FreshView() => Task.CompletedTask;
 
         public BaseView? ParentView { get; private set; } = null;
 

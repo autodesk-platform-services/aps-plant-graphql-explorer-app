@@ -201,6 +201,10 @@ namespace GraphQLClient.Services
             {
                 var code = await WaitForAuthorizationCodeAsync(listener, pkce, linkedCts.Token).ConfigureAwait(false);
                 var result = await RedeemAuthorizationCodeAsync(code, pkce, cancellationToken).ConfigureAwait(false);
+                if (!result.IsSuccess)
+                {
+                    throw new Exception(result.RawResponse);
+                }
                 CacheToken(result);
             }
             catch (OperationCanceledException) when (linkedCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)

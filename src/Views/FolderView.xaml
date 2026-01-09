@@ -11,7 +11,6 @@
     </local:BaseView.Resources>
     <Grid>
         <TreeView x:Name="folders" 
-                  Height="450"
                   ItemsSource="{Binding Folders}"
                   MouseDoubleClick="folders_MouseDoubleClick">
             <TreeView.ItemTemplate>

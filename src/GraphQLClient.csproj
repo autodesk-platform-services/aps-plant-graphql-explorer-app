@@ -7,11 +7,19 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Resources\launch.ico</ApplicationIcon>
-    <Version>1.0.9</Version>
+    <Version>1.0.10</Version>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Schema.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Resources\launch.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Examples.json" />
+    <Resource Include="Schema.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
