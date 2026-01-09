@@ -18,6 +18,7 @@
     <Resource Include="Resources\launch.ico">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Examples.json" />
     <Resource Include="Schema.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

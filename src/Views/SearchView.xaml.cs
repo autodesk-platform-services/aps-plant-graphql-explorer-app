@@ -36,6 +36,7 @@ namespace GraphQLClient.Views
         private TextPointer? _tokenStartPointer;
         private TextPointer? _tokenEndPointer;
         private SchemaObject _schemaObject;
+        private ExamplesObject _examplesObject;
 
         public bool IsLoading
         {
@@ -74,14 +75,15 @@ namespace GraphQLClient.Views
         {
             InitializeComponent();
 
-            var uri = new Uri("pack://application:,,,/Schema.json");
-            var resourceStream = Application.GetResourceStream(uri);
-            using (var reader = new StreamReader(resourceStream.Stream))
-            {
-                var jsonString = reader.ReadToEnd();
-                _schemaObject = JsonSerializer.Deserialize<SchemaObject>(jsonString);
-            }
+            // schemas
+            //
+            _schemaObject = GetResource<SchemaObject>("pack://application:,,,/Schema.json");
             SchemaGroups = _schemaObject.Data.Select(c => c.GroupName).ToList();
+            SchemaGroups.Sort();
+
+            // examples
+            //
+            _examplesObject = GetResource<ExamplesObject>("pack://application:,,,/Examples.json");
 
             _filteredSuggestions = CollectionViewSource.GetDefaultView(_searchHints);
             _filteredSuggestions.Filter = FilterSuggestion;
@@ -90,6 +92,15 @@ namespace GraphQLClient.Views
             _folder2dUrn = folder2dUrn;
             _folder3dUrn = folder3dUrn;
             referenceCombobox.SelectedIndex = 0;
+        }
+
+        private T GetResource<T>(string uristr)
+        {
+            var uri = new Uri(uristr);
+            var resourceStream = Application.GetResourceStream(uri);
+            using var reader = new StreamReader(resourceStream.Stream);
+            var jsonString = reader.ReadToEnd();
+            return JsonSerializer.Deserialize<T>(jsonString);
         }
 
         private string GetSearchText()
@@ -620,34 +631,35 @@ namespace GraphQLClient.Views
             };
             if (string.Compare(selectedValue, "All", StringComparison.OrdinalIgnoreCase) == 0)
             {
-                _currentPartTypeUrn = _folder2dUrn;
-                var data = _schemaObject.Data.SelectMany(c => c.SchemaList).ToList();
-                if (data != null && data.Count > 0)
+                var data = _schemaObject.Data.SelectMany(c => c.DataWithTag(_schemaObject.Prefix, _schemaObject.Version));
+                if (data != null)
                 {
-                    data.Sort(StringComparer.OrdinalIgnoreCase);
+                    data = data.OrderBy(c => c.Key, StringComparer.OrdinalIgnoreCase);
                     schemaList.ItemsSource = data;
                 }
             }
             else if (string.Compare(selectedValue, "Examples", StringComparison.OrdinalIgnoreCase) == 0)
             {
-                _currentPartTypeUrn = _folder3dUrn;
+                var data = _examplesObject.Examples.ToDictionary(k => k.Title, v => v.Script).ToList();
+                if (data != null && data.Count > 0)
+                {
+                    schemaList.ItemsSource = data;
+                }
             }
             else
             {
-                var data = _schemaObject.Data.FirstOrDefault(c => string.Compare(c.GroupName, selectedValue, StringComparison.OrdinalIgnoreCase) == 0);
-                if (data != null && data.SchemaList.Count > 0)
+                var singleData = _schemaObject.Data.FirstOrDefault(c => string.Compare(c.GroupName, selectedValue, StringComparison.OrdinalIgnoreCase) == 0);
+                if (singleData != null && singleData.SchemaList.Count > 0)
                 {
-                    data.SchemaList.Sort(StringComparer.OrdinalIgnoreCase);
-                    schemaList.ItemsSource = data.SchemaList;
+                    var data = singleData.DataWithTag(_schemaObject.Prefix, _schemaObject.Version);
+                    schemaList.ItemsSource = data;
                 }
             }
         }
 
-        private string GetFullSchemaParameter(string schemaName) => $"{_schemaObject.Prefix}:{schemaName}-{_schemaObject.Version}";
-
         private void SchemaList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var item = ((ListBoxItem)sender).Content;
+            var item = ((ListBoxItem)sender).Tag.ToString();
             var lastBlock = searchTextBox.Document.Blocks.LastBlock as Paragraph;
             if (lastBlock == null)
             {
@@ -655,7 +667,7 @@ namespace GraphQLClient.Views
                 searchTextBox.Document.Blocks.Add(lastBlock);
             }
 
-            lastBlock.Inlines.Add(new Run(GetFullSchemaParameter(item.ToString())));
+            lastBlock.Inlines.Add(new Run(item));
         }
     }
 }

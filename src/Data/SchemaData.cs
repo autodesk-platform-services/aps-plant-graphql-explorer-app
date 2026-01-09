@@ -21,5 +21,17 @@ namespace GraphQLClient.Data
         public string GroupName { get; set; }
         [JsonPropertyName("data")]
         public List<string> SchemaList { get; set; }
+
+        private IEnumerable<KeyValuePair<string,string>> _schemaDic;
+        public IEnumerable<KeyValuePair<string, string>> DataWithTag(string prefix, string version)
+        {
+            if (_schemaDic == null)
+            {
+                _schemaDic = SchemaList.ToDictionary(k => k, v => $"{prefix}:{v}-{version}")
+                                       .ToList()
+                                       .OrderBy(c => c.Key, StringComparer.OrdinalIgnoreCase);
+            }
+            return _schemaDic;
+        }
     }
 }

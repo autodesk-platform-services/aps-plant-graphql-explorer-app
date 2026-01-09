@@ -29,12 +29,12 @@
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="White" />
-                <Setter Property="Foreground" Value="#FF2D74DA"/>
-                <Setter Property="BorderBrush" Value="#FF2D74DA"/>
+                <Setter Property="Foreground" Value="#0696D7"/>
+                <Setter Property="BorderBrush" Value="#0696D7"/>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
                 <Setter Property="Background" Value="Gray" />
-                <Setter Property="Foreground" Value="#FF2D74DA"/>
+                <Setter Property="Foreground" Value="#0696D7"/>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.55" />

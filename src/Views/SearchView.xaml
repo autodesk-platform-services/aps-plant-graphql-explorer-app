@@ -133,13 +133,17 @@
                               Grid.Row="0"
                               SelectedIndex="-1"
                               Margin="10"
-                              SelectionChanged="referenceCombobox_SelectionChanged">
+                              SelectionChanged="referenceCombobox_SelectionChanged"
+                              Background="White"
+                              BorderBrush="#CCC"
+                              BorderThickness="1"
+                              Padding="5">
                         <ComboBox.ItemsSource>
                             <CompositeCollection>
                                 <ComboBoxItem Content="All"/>
-                                <Separator/>
+                                <Separator Height="3" Background="Gray" Margin="0,5"/>
                                 <CollectionContainer Collection="{Binding Source={StaticResource schemaGroups}}"/>
-                                <Separator/>
+                                <Separator Height="3" Background="Gray" Margin="0,5"/>
                                 <ComboBoxItem Content="Examples"/>
                             </CompositeCollection>
                         </ComboBox.ItemsSource>
@@ -151,6 +155,9 @@
                          Margin="10,0,10,10">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
+                                <Setter Property="ToolTip" Value="Double-click to append to the query box"/>
+                                <Setter Property="Content" Value="{Binding Key}"/>
+                                <Setter Property="Tag" Value="{Binding Value}"/>
                                 <EventSetter Event="MouseDoubleClick" Handler="SchemaList_MouseDoubleClick"/>
                             </Style>
                         </ListBox.ItemContainerStyle>
@@ -176,14 +183,18 @@
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Query:" Margin="10" FontSize="12" Grid.Column="0"/>
-                            <TextBlock Text="Scope:" Margin="10" FontSize="12" Grid.Column="1"/>
+                            <TextBlock Text="Query:" Margin="10" FontSize="12" Grid.Column="0" VerticalAlignment="Bottom"/>
+                            <TextBlock Text="Scope:" Margin="10" FontSize="12" Grid.Column="1" VerticalAlignment="Bottom"/>
                             <ComboBox x:Name="partTypeCombobox"
                                   Grid.Column="2"
                                   HorizontalAlignment="Right"
-                                  Width="100" Height="25" Margin="10"
+                                  Width="122" Height="25" Margin="10"
                                   SelectionChanged="partTypeCombobox_SelectionChanged" 
                                   HorizontalContentAlignment="Center"
+                                  Background="White"
+                                  BorderBrush="#CCC"
+                                  BorderThickness="1"
+                                  Padding="5"
                                   SelectedIndex="0">
                                     <ComboBoxItem Content="3D Model"/>
                                     <ComboBoxItem Content="PnId Model"/>
@@ -253,7 +264,8 @@
                         Margin="10, 0, 10, 10" 
                         Content="Run" 
                         HorizontalAlignment="Right"
-                        Width="100" Height="25" 
+                        Width="122" Height="25" 
+                        Background="#0696D7"
                         Click="SearchButton_Click" />
                     </Grid>
 
@@ -318,13 +330,19 @@
                 <Button Content="&lt;&lt; Choose project"
                     Margin="10"
                     HorizontalAlignment="Left"
-                    Width="150" Height="25"
+                    Width="138" Height="25"
+                    Background="Transparent"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
                     Click="ChooseProject_Click"/>
                 <Button 
                     Margin="10" 
                     Content="Export CSV"
-                    Width="100" Height="25"
+                    Width="122" Height="25"
                     HorizontalAlignment="Right"
+                    Background="Transparent"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
                     Click="ExportButton_Click" />
             </Grid>
         </Grid>

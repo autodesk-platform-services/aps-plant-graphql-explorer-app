@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:v="clr-namespace:GraphQLClient.Views"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -40,19 +41,32 @@
                             <DataTrigger Binding="{Binding ParentView}" Value="{x:Null}">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding ViewType}" Value="{x:Static v:ViewTypes.Search}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Button.Style>
             </Button>
             <Button 
                 x:Name="freshViewButton"
-                Style="{StaticResource OutlineButtonStyle}"
                 Content="Refresh View"
                 Margin="12"
                 Height="24"
                 Width="90"
                 DockPanel.Dock="Right"
-                Click="freshViewButton_Click"/>
+                Click="freshViewButton_Click">
+                <Button.Style>
+                    <Style BasedOn="{StaticResource OutlineButtonStyle}" TargetType="Button">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ViewType}" Value="{x:Static v:ViewTypes.Search}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
         </DockPanel>
 
         <Grid x:Name="ViewGrid"

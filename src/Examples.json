@@ -1,0 +1,12 @@
+{
+  "Examples": [
+    {
+      "Title": "Query 2d HandValves",
+      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains=HandValves"
+    },
+    {
+      "Title": "Query 2d valves in a DWG",
+      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains='HandValves' and property.id.autodesk.plant3d.parameter:dwgId-1.0.0 == 1275"
+    }
+  ]
+}
