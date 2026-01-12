@@ -16,54 +16,25 @@
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="P"
-                                   FontSize="14"
-                                   Height="16"
+                        <Rectangle Height="16"
                                    Width="16"
-                                   HorizontalAlignment="Center"
-                                   FontWeight="Bold"
-                                   Margin="0,0,6,0">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
+                                   Margin="0,0,6,0"
+                                   Fill="{Binding ProjectIconBrush}"
+                                   ToolTip="{Binding Notification}">
+                            <Rectangle.Style>
+                                <Style TargetType="Rectangle">
                                     <Setter Property="Visibility" Value="Visible" />
-                                    <Setter Property="Foreground" Value="#1F2937" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsPlantProject}" Value="False">
-                                            <Setter Property="Foreground" Value="Transparent" />
+                                            <Setter Property="Visibility" Value="Hidden" />
                                         </DataTrigger>
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding HasPipingDataset}" Value="True" />
-                                                <Condition Binding="{Binding HasPIDDataset}" Value="True" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter Property="Foreground" Value="#adf032" />
-                                        </MultiDataTrigger>
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding HasPipingDataset}" Value="False" />
-                                                <Condition Binding="{Binding HasPIDDataset}" Value="True" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter Property="Foreground" Value="#F59E0B" />
-                                        </MultiDataTrigger>
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding HasPipingDataset}" Value="True" />
-                                                <Condition Binding="{Binding HasPIDDataset}" Value="False" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter Property="Foreground" Value="#F59E0B" />
-                                        </MultiDataTrigger>
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding IsPlantProject}" Value="True" />
-                                                <Condition Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType=TreeViewItem}}" Value="True" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter Property="Foreground" Value="White" />
-                                        </MultiDataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        
+                            </Rectangle.Style>
+                            <Rectangle.OpacityMask>
+                                <ImageBrush ImageSource="pack://application:,,,/Resources/project.tif" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
                         <TextBlock Text="{Binding Name}" Tag="{Binding Id}" FontSize="14"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
