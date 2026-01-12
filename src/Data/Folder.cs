@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using System.Windows.Media;
 
 namespace GraphQLClient.Data
 {
@@ -67,6 +68,7 @@ namespace GraphQLClient.Data
                     _pipingDataset = value ?? string.Empty;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(HasPipingDataset));
+                    OnPropertyChanged(nameof(ProjectIconBrush));
                 }
             }
         }
@@ -83,6 +85,7 @@ namespace GraphQLClient.Data
                     _pidDataset = value ?? string.Empty;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(HasPIDDataset));
+                    OnPropertyChanged(nameof(ProjectIconBrush));
                 }
             }
         }
@@ -92,6 +95,21 @@ namespace GraphQLClient.Data
 
         [JsonIgnore]
         public bool HasPIDDataset => !string.IsNullOrWhiteSpace(_pidDataset);
+
+        private static readonly SolidColorBrush MissingDatasetBrush = new SolidColorBrush(Color.FromRgb(220, 38, 38));
+
+        static Folder()
+        {
+            if (MissingDatasetBrush.CanFreeze)
+            {
+                MissingDatasetBrush.Freeze();
+            }
+        }
+
+        [JsonIgnore]
+        public Brush ProjectIconBrush => (HasPipingDataset && HasPIDDataset) ? Brushes.Black : MissingDatasetBrush;
+
+        public string? Notification => (!HasPipingDataset || !HasPIDDataset) ? "Dataset with one or both File+ missing" : null;
 
         [JsonPropertyName("parentFolder")]
         public FolderReference? ParentFolder { get; set; }
