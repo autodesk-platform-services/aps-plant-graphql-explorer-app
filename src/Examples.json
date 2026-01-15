@@ -1,12 +1,44 @@
 {
   "Examples": [
     {
-      "Title": "Query 2d HandValves",
+      "Title": "Query valves in project (P&ID)",
+      "Scope": "PID",
       "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains=HandValves"
     },
     {
-      "Title": "Query 2d valves in a DWG",
+      "Title": "Query valves in project (3D)",
+      "Scope": "P3D",
+      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains=Valve"
+    },
+    {
+      "Title": "Query valves per DWG (P&ID)",
+      "Scope": "PID",
       "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains='HandValves' and property.id.autodesk.plant3d.parameter:dwgId-1.0.0 == 1275"
+    },
+    {
+      "Title": "Query valves per DWG (3D)",
+      "Scope": "P3D",
+      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains='Valve' and property.id.autodesk.plant3d.parameter:dwgId-1.0.0 == 4346"
+    },
+    {
+      "Title": "Query equipment in project (P&ID)",
+      "Scope": "PID",
+      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains=Equipment"
+    },
+    {
+      "Title": "Query equipment in project (3D)",
+      "Scope": "P3D",
+      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains=Equipment"
+    },
+    {
+      "Title": "Query line numbers in project (P&ID)",
+      "Scope": "PID",
+      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains='Primary' and property.id.autodesk.plant3d.parameter:tag-1.0.0=contains='4\"-CS300-P-'"
+    },
+    {
+      "Title": "Query line numbers in project (3D)",
+      "Scope": "P3D",
+      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains='Pipe' and property.id.autodesk.plant3d.parameter:lineNumberTag-1.0.0=contains='1009'"
     }
   ]
 }
