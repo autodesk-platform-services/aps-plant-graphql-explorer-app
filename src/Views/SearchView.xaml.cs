@@ -92,6 +92,7 @@ namespace GraphQLClient.Views
             _folder2dUrn = folder2dUrn;
             _folder3dUrn = folder3dUrn;
             referenceCombobox.SelectedIndex = 0;
+            partTypeCombobox.SelectedIndex = 0;
         }
 
         private T GetResource<T>(string uristr)
@@ -720,9 +721,11 @@ namespace GraphQLClient.Views
 
         private void SchemaList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var tuple = ((ListBoxItem)sender).Tag;
-            if (tuple is (string script, string scope))
+            var tag = ((ListBoxItem)sender).Tag;
+            if (tag is (string script, string scope))
             {
+                searchTextBox.Document.Blocks.Clear();
+
                 var lastBlock = searchTextBox.Document.Blocks.LastBlock as Paragraph;
                 if (lastBlock == null)
                 {
@@ -734,8 +737,20 @@ namespace GraphQLClient.Views
 
                 if (!string.IsNullOrEmpty(scope))
                 {
-                    partTypeCombobox.SelectedIndex = string.Compare(scope, "3D", StringComparison.OrdinalIgnoreCase) == 0 ? 0 : 1;
+                    var index = string.Compare(scope, "P3D", StringComparison.OrdinalIgnoreCase) == 0 ? 0 : 1;
+                    partTypeCombobox.SelectedIndex = index;
                 }
+            }
+            if (tag is string singleScript)
+            {
+                var lastBlock = searchTextBox.Document.Blocks.LastBlock as Paragraph;
+                if (lastBlock == null)
+                {
+                    lastBlock = new Paragraph();
+                    searchTextBox.Document.Blocks.Add(lastBlock);
+                }
+
+                lastBlock.Inlines.Add(new Run(singleScript));
             }
         }
     }

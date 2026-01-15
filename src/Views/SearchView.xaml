@@ -195,7 +195,7 @@
                                   BorderBrush="#CCC"
                                   BorderThickness="1"
                                   Padding="5"
-                                  SelectedIndex="0">
+                                  SelectedIndex="-1">
                                     <ComboBoxItem Content="3D Model"/>
                                     <ComboBoxItem Content="P&amp;ID"/>
                             </ComboBox>
@@ -205,7 +205,6 @@
                           Grid.Row="1"
                           Margin="10, 0, 10, 10"
                           MinHeight="50"
-                          Foreground="#1F2937"
                           Background="#F9FBFF"
                           BorderBrush="#C6D4F2"
                           BorderThickness="1"
@@ -214,19 +213,9 @@
                           HorizontalContentAlignment="Left"
                           HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto"
-                          SpellCheck.IsEnabled="True"
                           TextChanged="searchTextBox_TextChanged"
                           PreviewKeyDown="searchTextBox_PreviewKeyDown"
                           LostKeyboardFocus="searchTextBox_LostKeyboardFocus">
-                            <RichTextBox.Resources>
-                                <Style TargetType="FlowDocument">
-                                    <Setter Property="PagePadding" Value="0" />
-                                    <Setter Property="LineHeight" Value="3" />
-                                </Style>
-                                <Style TargetType="Paragraph">
-                                    <Setter Property="Margin" Value="0" />
-                                </Style>
-                            </RichTextBox.Resources>
                         </RichTextBox>
                         <Popup x:Name="suggestionsPopup"
                         PlacementTarget="{Binding ElementName=searchTextBox}"
