@@ -310,6 +310,7 @@ namespace GraphQLClient.Views
         {
             try
             {
+                ElementTable.DefaultView.Sort = null;
                 ElementTable.Clear();
                 ElementTable.Columns.Clear();
 
@@ -359,6 +360,23 @@ namespace GraphQLClient.Views
 
                 }
 
+                // order columns alphabetically
+                //
+                var columns = ElementTable
+                                .Columns
+                                .Cast<DataColumn>()
+                                .OrderBy(c => c.ColumnName, StringComparer.OrdinalIgnoreCase)
+                                .ToList();
+
+                columns.FirstOrDefault(c => c.ColumnName == "Size")?.SetOrdinal(0);
+                columns.FirstOrDefault(c => c.ColumnName == "Spec")?.SetOrdinal(1);
+                columns.FirstOrDefault(c => c.ColumnName == "Description")?.SetOrdinal(2);
+                columns.FirstOrDefault(c => c.ColumnName == "Tag")?.SetOrdinal(3);
+
+                // sort rows by size
+                //
+                SortDataTable();
+
                 resultsDataGrid.ItemsSource = null;
                 resultsDataGrid.AutoGenerateColumns = true;
                 resultsDataGrid.Columns.Clear();
@@ -369,6 +387,17 @@ namespace GraphQLClient.Views
             {
                 // Handle error - could show in UI
                 MessageBox.Show($"Error loading search results: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void SortDataTable()
+        {
+            if (ElementTable == null)
+                return;
+
+            if (ElementTable.Columns.Contains("Size"))
+            {
+                ElementTable.DefaultView.Sort = $"Size ASC";
             }
         }
 
@@ -623,51 +652,91 @@ namespace GraphQLClient.Views
 
             schemaList.ItemsSource = null;
 
-            var selectedValue = referenceCombobox.SelectedItem switch
+            var index = referenceCombobox.SelectedIndex;
+            switch (index)
             {
-                ComboBoxItem cbi => cbi.Content?.ToString() ?? string.Empty,
-                string str => str,
-                _ => string.Empty
-            };
-            if (string.Compare(selectedValue, "All", StringComparison.OrdinalIgnoreCase) == 0)
-            {
-                var data = _schemaObject.Data.SelectMany(c => c.DataWithTag(_schemaObject.Prefix, _schemaObject.Version));
-                if (data != null)
-                {
-                    data = data.OrderBy(c => c.Key, StringComparer.OrdinalIgnoreCase);
-                    schemaList.ItemsSource = data;
-                }
+                case 0: // Examples
+                    {
+                        var data = _examplesObject.Examples.ToDictionary(k => k.Title, v => (v.Script, v.Scope)).ToList();
+                        if (data != null && data.Count > 0)
+                        {
+                            schemaList.ItemsSource = data;
+                        }
+                    }
+                    break;
+                case 2: // ALL
+                    {
+                        var data = _schemaObject.Data.SelectMany(c => c.DataWithTag(_schemaObject.Prefix, _schemaObject.Version));
+                        if (data != null)
+                        {
+                            data = data.OrderBy(c => c.Key, StringComparer.OrdinalIgnoreCase);
+                            schemaList.ItemsSource = data;
+                        }
+                    }
+                    break;
+                default: // Specific Group
+                    var groupName = SchemaGroups[index - 2];
+                    var singleData = _schemaObject.Data.FirstOrDefault(c => string.Compare(c.GroupName, groupName, StringComparison.OrdinalIgnoreCase) == 0);
+                    if (singleData != null && singleData.SchemaList.Count > 0)
+                    {
+                        var groupData = singleData.DataWithTag(_schemaObject.Prefix, _schemaObject.Version);
+                        schemaList.ItemsSource = groupData;
+                    }
+                    break;
             }
-            else if (string.Compare(selectedValue, "Examples", StringComparison.OrdinalIgnoreCase) == 0)
-            {
-                var data = _examplesObject.Examples.ToDictionary(k => k.Title, v => v.Script).ToList();
-                if (data != null && data.Count > 0)
-                {
-                    schemaList.ItemsSource = data;
-                }
-            }
-            else
-            {
-                var singleData = _schemaObject.Data.FirstOrDefault(c => string.Compare(c.GroupName, selectedValue, StringComparison.OrdinalIgnoreCase) == 0);
-                if (singleData != null && singleData.SchemaList.Count > 0)
-                {
-                    var data = singleData.DataWithTag(_schemaObject.Prefix, _schemaObject.Version);
-                    schemaList.ItemsSource = data;
-                }
-            }
+            //var selectedValue = referenceCombobox.SelectedItem switch
+            //{
+            //    ComboBoxItem cbi => cbi.Content?.ToString() ?? string.Empty,
+            //    string str => str,
+            //    _ => string.Empty
+            //};
+            //if (string.Compare(selectedValue, "All", StringComparison.OrdinalIgnoreCase) == 0)
+            //{
+            //    var data = _schemaObject.Data.SelectMany(c => c.DataWithTag(_schemaObject.Prefix, _schemaObject.Version));
+            //    if (data != null)
+            //    {
+            //        data = data.OrderBy(c => c.Key, StringComparer.OrdinalIgnoreCase);
+            //        schemaList.ItemsSource = data;
+            //    }
+            //}
+            //else if (string.Compare(selectedValue, "Examples", StringComparison.OrdinalIgnoreCase) == 0)
+            //{
+            //    var data = _examplesObject.Examples.ToDictionary(k => k.Title, v => v.Script).ToList();
+            //    if (data != null && data.Count > 0)
+            //    {
+            //        schemaList.ItemsSource = data;
+            //    }
+            //}
+            //else
+            //{
+            //    var singleData = _schemaObject.Data.FirstOrDefault(c => string.Compare(c.GroupName, selectedValue, StringComparison.OrdinalIgnoreCase) == 0);
+            //    if (singleData != null && singleData.SchemaList.Count > 0)
+            //    {
+            //        var data = singleData.DataWithTag(_schemaObject.Prefix, _schemaObject.Version);
+            //        schemaList.ItemsSource = data;
+            //    }
+            //}
         }
 
         private void SchemaList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var item = ((ListBoxItem)sender).Tag.ToString();
-            var lastBlock = searchTextBox.Document.Blocks.LastBlock as Paragraph;
-            if (lastBlock == null)
+            var tuple = ((ListBoxItem)sender).Tag;
+            if (tuple is (string script, string scope))
             {
-                lastBlock = new Paragraph();
-                searchTextBox.Document.Blocks.Add(lastBlock);
-            }
+                var lastBlock = searchTextBox.Document.Blocks.LastBlock as Paragraph;
+                if (lastBlock == null)
+                {
+                    lastBlock = new Paragraph();
+                    searchTextBox.Document.Blocks.Add(lastBlock);
+                }
 
-            lastBlock.Inlines.Add(new Run(item));
+                lastBlock.Inlines.Add(new Run(script));
+
+                if (!string.IsNullOrEmpty(scope))
+                {
+                    partTypeCombobox.SelectedIndex = string.Compare(scope, "3D", StringComparison.OrdinalIgnoreCase) == 0 ? 0 : 1;
+                }
+            }
         }
     }
 }
