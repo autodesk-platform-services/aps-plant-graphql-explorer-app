@@ -48,8 +48,6 @@ namespace GraphQLClient.Views
             }
         }
 
-        public DataTable ElementTable { get; } = new DataTable();
-        public DataView ElementTableView => ElementTable.DefaultView;
         public ICollectionView FilteredSuggestions => _filteredSuggestions;
         public List<string> SchemaGroups { get; set; }
 
@@ -226,9 +224,10 @@ namespace GraphQLClient.Views
             }
         }
 
-        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        private async void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ElementTable.Rows.Count == 0 || ElementTable.Columns.Count == 0)
+            var source = resultsDataGrid.ItemsSource as DataView;
+            if (source == null || source.Count == 0 || source.Table == null || source.Table.Columns.Count == 0)
             {
                 MessageBox.Show("No results to export.", "Export", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
@@ -248,7 +247,7 @@ namespace GraphQLClient.Views
 
             try
             {
-                ExportToCsv(dialog.FileName);
+                await Task.Run(() => ExportToCsv(dialog.FileName));
                 MessageBox.Show("Search results exported successfully.", "Export", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -311,78 +310,13 @@ namespace GraphQLClient.Views
         {
             try
             {
-                ElementTable.DefaultView.Sort = null;
-                ElementTable.Clear();
-                ElementTable.Columns.Clear();
+                var table = await Task.Run(() => BuildTable(elementGroupId, searchTerm));
 
-                var response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<SearchData>>(QueryCommands.Query_SearchElements,
-                    new { groupId = elementGroupId, filter = new { query = searchTerm } });
-                string previousCursor = string.Empty;
-                while (true)
+                Dispatcher.Invoke(() =>
                 {
-                    var cursor = response?.Data?.ElementWraps?.Pagination?.Cursor;
-                    var elementWraps = response?.Data?.ElementWraps?.Results;
-                    if (elementWraps != null && elementWraps.Count > 0)
-                    {
-                        foreach (var elementWrap in elementWraps)
-                        {
-                            var row = ElementTable.NewRow();
+                    resultsDataGrid.ItemsSource = table.DefaultView;
+                });
 
-                            foreach (var column in elementWrap.RowData.Columns)
-                            {
-                                var columnName = column.Definition?.Name;
-                                if (string.IsNullOrWhiteSpace(columnName))
-                                {
-                                    // skip if the column name is null
-                                    continue;
-                                }
-
-                                if (!ElementTable.Columns.Contains(columnName))
-                                {
-                                    ElementTable.Columns.Add(columnName, typeof(string));
-                                }
-
-                                row[columnName] = column.Value;
-                            }
-
-                            ElementTable.Rows.Add(row);
-                        }
-                    }
-
-                    if (string.IsNullOrEmpty(cursor) || string.Compare(cursor, previousCursor, StringComparison.OrdinalIgnoreCase) == 0)
-                    {
-                        break;
-                    }
-
-                    previousCursor = cursor;
-
-                    response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<SearchData>>(QueryCommands.Query_SearchElements,
-                        new { groupId = elementGroupId, filter = new { query = searchTerm }, pagination = new { cursor = cursor } });
-
-                }
-
-                // order columns alphabetically
-                //
-                var columns = ElementTable
-                                .Columns
-                                .Cast<DataColumn>()
-                                .OrderBy(c => c.ColumnName, StringComparer.OrdinalIgnoreCase)
-                                .ToList();
-
-                columns.FirstOrDefault(c => c.ColumnName == "Size")?.SetOrdinal(0);
-                columns.FirstOrDefault(c => c.ColumnName == "Spec")?.SetOrdinal(1);
-                columns.FirstOrDefault(c => c.ColumnName == "Description")?.SetOrdinal(2);
-                columns.FirstOrDefault(c => c.ColumnName == "Tag")?.SetOrdinal(3);
-
-                // sort rows by size
-                //
-                SortDataTable();
-
-                resultsDataGrid.ItemsSource = null;
-                resultsDataGrid.AutoGenerateColumns = true;
-                resultsDataGrid.Columns.Clear();
-                resultsDataGrid.ItemsSource = ElementTable.DefaultView;
-                resultsDataGrid.Items.Refresh();
             }
             catch (Exception ex)
             {
@@ -391,15 +325,84 @@ namespace GraphQLClient.Views
             }
         }
 
-        private void SortDataTable()
+        private async Task<DataTable> BuildTable(string elementGroupId, string searchTerm)
         {
-            if (ElementTable == null)
-                return;
-
-            if (ElementTable.Columns.Contains("Size"))
+            var dataTable = new DataTable();
+            var response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<SearchData>>(QueryCommands.Query_SearchElements,
+                    new { groupId = elementGroupId, filter = new { query = searchTerm } });
+            string previousCursor = string.Empty;
+            HashSet<string> columnSet = null;
+            while (true)
             {
-                ElementTable.DefaultView.Sort = $"Size ASC";
+                var cursor = response?.Data?.ElementWraps?.Pagination?.Cursor;
+                var elementWraps = response?.Data?.ElementWraps?.Results;
+                if (elementWraps != null && elementWraps.Count > 0)
+                {
+                    if (columnSet == null)
+                    {
+                        var firstElement = elementWraps[0];
+                        columnSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        foreach (var column in firstElement.RowData.Columns)
+                        {
+                            var columnName = column.Definition?.Name;
+                            if (!string.IsNullOrWhiteSpace(columnName))
+                            {
+                                columnSet.Add(columnName);
+                            }
+                        }
+
+                        foreach (var columnName in columnSet)
+                        {
+                            dataTable.Columns.Add(columnName, typeof(string));
+                        }
+                    }
+
+                    foreach (var elementWrap in elementWraps)
+                    {
+                        var row = dataTable.NewRow();
+
+                        foreach (var column in elementWrap.RowData.Columns)
+                        {
+                            row[column.Name] = column.Value;
+                        }
+
+                        dataTable.Rows.Add(row);
+                    }
+                }
+
+                if (string.IsNullOrEmpty(cursor) || string.Compare(cursor, previousCursor, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    break;
+                }
+
+                previousCursor = cursor;
+
+                response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<SearchData>>(QueryCommands.Query_SearchElements,
+                    new { groupId = elementGroupId, filter = new { query = searchTerm }, pagination = new { cursor = cursor } });
+
             }
+
+            // order columns alphabetically
+            //
+            var columns = dataTable
+                            .Columns
+                            .Cast<DataColumn>()
+                            .OrderBy(c => c.ColumnName, StringComparer.OrdinalIgnoreCase)
+                            .ToList();
+
+            columns.FirstOrDefault(c => c.ColumnName == "Size")?.SetOrdinal(0);
+            columns.FirstOrDefault(c => c.ColumnName == "Spec")?.SetOrdinal(1);
+            columns.FirstOrDefault(c => c.ColumnName == "Description")?.SetOrdinal(2);
+            columns.FirstOrDefault(c => c.ColumnName == "Tag")?.SetOrdinal(3);
+
+            // sort rows by size
+            //
+            if (dataTable.Columns.Contains("Size"))
+            {
+                dataTable.DefaultView.Sort = $"Size ASC";
+            }
+
+            return dataTable;
         }
 
         private void ExportToCsv(string filePath)
@@ -413,15 +416,22 @@ namespace GraphQLClient.Views
 
         private void WriteCsvHeaders(StreamWriter writer)
         {
+            var dv = resultsDataGrid.ItemsSource as DataView;
+            if (dv == null || dv.Table == null)
+            {
+                return;
+            }
+
+            var dt = dv.Table;
             var headerBuilder = new StringBuilder();
-            for (int i = 0; i < ElementTable.Columns.Count; i++)
+            for (int i = 0; i < dt.Columns.Count; i++)
             {
                 if (i > 0)
                 {
                     headerBuilder.Append(',');
                 }
 
-                headerBuilder.Append(EscapeForCsv(ElementTable.Columns[i].ColumnName));
+                headerBuilder.Append(EscapeForCsv(dt.Columns[i].ColumnName));
             }
 
             writer.WriteLine(headerBuilder.ToString());
@@ -429,10 +439,17 @@ namespace GraphQLClient.Views
 
         private void WriteCsvRows(StreamWriter writer)
         {
-            foreach (DataRow row in ElementTable.Rows)
+            var dv = resultsDataGrid.ItemsSource as DataView;
+            if (dv == null || dv.Table == null)
+            {
+                return;
+            }
+
+            var dt = dv.Table;
+            foreach (DataRow row in dt.Rows)
             {
                 var rowBuilder = new StringBuilder();
-                for (int i = 0; i < ElementTable.Columns.Count; i++)
+                for (int i = 0; i < dt.Columns.Count; i++)
                 {
                     if (i > 0)
                     {
@@ -685,38 +702,6 @@ namespace GraphQLClient.Views
                     }
                     break;
             }
-            //var selectedValue = referenceCombobox.SelectedItem switch
-            //{
-            //    ComboBoxItem cbi => cbi.Content?.ToString() ?? string.Empty,
-            //    string str => str,
-            //    _ => string.Empty
-            //};
-            //if (string.Compare(selectedValue, "All", StringComparison.OrdinalIgnoreCase) == 0)
-            //{
-            //    var data = _schemaObject.Data.SelectMany(c => c.DataWithTag(_schemaObject.Prefix, _schemaObject.Version));
-            //    if (data != null)
-            //    {
-            //        data = data.OrderBy(c => c.Key, StringComparer.OrdinalIgnoreCase);
-            //        schemaList.ItemsSource = data;
-            //    }
-            //}
-            //else if (string.Compare(selectedValue, "Examples", StringComparison.OrdinalIgnoreCase) == 0)
-            //{
-            //    var data = _examplesObject.Examples.ToDictionary(k => k.Title, v => v.Script).ToList();
-            //    if (data != null && data.Count > 0)
-            //    {
-            //        schemaList.ItemsSource = data;
-            //    }
-            //}
-            //else
-            //{
-            //    var singleData = _schemaObject.Data.FirstOrDefault(c => string.Compare(c.GroupName, selectedValue, StringComparison.OrdinalIgnoreCase) == 0);
-            //    if (singleData != null && singleData.SchemaList.Count > 0)
-            //    {
-            //        var data = singleData.DataWithTag(_schemaObject.Prefix, _schemaObject.Version);
-            //        schemaList.ItemsSource = data;
-            //    }
-            //}
         }
 
         private void SchemaList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
