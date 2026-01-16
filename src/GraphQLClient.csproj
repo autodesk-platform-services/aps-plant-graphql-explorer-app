@@ -21,8 +21,8 @@
     <Resource Include="Resources\project.tif">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Examples.json" />
-    <Resource Include="Schema.json">
+    <Resource Include="Data\Examples.json" />
+    <Resource Include="Data\Schema.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
