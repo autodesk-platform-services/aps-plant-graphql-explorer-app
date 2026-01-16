@@ -331,38 +331,28 @@ namespace GraphQLClient.Views
             var response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<SearchData>>(QueryCommands.Query_SearchElements,
                     new { groupId = elementGroupId, filter = new { query = searchTerm } });
             string previousCursor = string.Empty;
-            HashSet<string> columnSet = null;
+            HashSet<string> columnSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             while (true)
             {
                 var cursor = response?.Data?.ElementWraps?.Pagination?.Cursor;
                 var elementWraps = response?.Data?.ElementWraps?.Results;
                 if (elementWraps != null && elementWraps.Count > 0)
                 {
-                    if (columnSet == null)
-                    {
-                        var firstElement = elementWraps[0];
-                        columnSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                        foreach (var column in firstElement.RowData.Columns)
-                        {
-                            var columnName = column.Definition?.Name;
-                            if (!string.IsNullOrWhiteSpace(columnName))
-                            {
-                                columnSet.Add(columnName);
-                            }
-                        }
-
-                        foreach (var columnName in columnSet)
-                        {
-                            dataTable.Columns.Add(columnName, typeof(string));
-                        }
-                    }
-
                     foreach (var elementWrap in elementWraps)
                     {
                         var row = dataTable.NewRow();
 
                         foreach (var column in elementWrap.RowData.Columns)
                         {
+                            var columnName = column.Definition?.Name;
+                            if (!string.IsNullOrWhiteSpace(columnName))
+                            {
+                                if (columnSet.Add(columnName))
+                                {
+                                    dataTable.Columns.Add(columnName, typeof(string));
+                                }
+                            }
+
                             row[column.Name] = column.Value;
                         }
 
@@ -390,10 +380,11 @@ namespace GraphQLClient.Views
                             .OrderBy(c => c.ColumnName, StringComparer.OrdinalIgnoreCase)
                             .ToList();
 
-            columns.FirstOrDefault(c => c.ColumnName == "Size")?.SetOrdinal(0);
-            columns.FirstOrDefault(c => c.ColumnName == "Spec")?.SetOrdinal(1);
-            columns.FirstOrDefault(c => c.ColumnName == "Description")?.SetOrdinal(2);
-            columns.FirstOrDefault(c => c.ColumnName == "Tag")?.SetOrdinal(3);
+            int index = 0;
+            columns.FirstOrDefault(c => c.ColumnName == "Size")?.SetOrdinal(index++);
+            columns.FirstOrDefault(c => c.ColumnName == "Tag")?.SetOrdinal(index++);
+            columns.FirstOrDefault(c => c.ColumnName == "Description")?.SetOrdinal(index++);
+            columns.FirstOrDefault(c => c.ColumnName == "Spec")?.SetOrdinal(index);
 
             // sort rows by size
             //
@@ -401,8 +392,12 @@ namespace GraphQLClient.Views
             {
                 dataTable.DefaultView.Sort = $"Size ASC";
             }
+            else if (dataTable.Columns.Contains("Tag"))
+            {
+                dataTable.DefaultView.Sort = $"Tag ASC";
+            }
 
-            return dataTable;
+                return dataTable;
         }
 
         private void ExportToCsv(string filePath)
