@@ -18,8 +18,6 @@
                       Margin="0 6 0 0"
                       SelectedIndex="0"
                       SelectionChanged="EnvironmentComboBox_SelectionChanged">
-                <ComboBoxItem Content="Staging" Tag="Staging" />
-                <ComboBoxItem Content="Production" Tag="Production" />
             </ComboBox>
         </StackPanel>
 

@@ -21,7 +21,20 @@ namespace GraphQLClient.Views
         public LoginView()
         {
             InitializeComponent();
-            Loaded += delegate { SetClientConfiguration(_currentEnv); GQLRequest.Environment = _currentEnv; };
+            Loaded += delegate
+            {
+                var envs = new List<GraphQLEnvironment> { GraphQLEnvironment.Production };
+#if DEBUG
+                envs.Insert(0, GraphQLEnvironment.Staging);
+                _currentEnv = GraphQLEnvironment.Staging;
+#else
+                _currentEnv = GraphQLEnvironment.Production;
+#endif
+                EnvironmentComboBox.ItemsSource = envs;
+
+                SetClientConfiguration(_currentEnv);
+                GQLRequest.Environment = _currentEnv;
+            };
         }
 
         private GraphQLEnvironment _currentEnv;
@@ -56,9 +69,9 @@ namespace GraphQLClient.Views
 
         private void EnvironmentComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (EnvironmentComboBox.SelectedItem is ComboBoxItem selectedItem)
+            if (EnvironmentComboBox.SelectedItem != null)
             {
-                _currentEnv = Enum.TryParse<GraphQLEnvironment>(selectedItem.Tag.ToString(), out var env) ? env : GraphQLEnvironment.Staging;
+                _currentEnv = Enum.TryParse<GraphQLEnvironment>(EnvironmentComboBox.SelectedItem.ToString(), out var env) ? env : GraphQLEnvironment.Staging;
                 Request.Environment = _currentEnv;
 
                 if (ConfigBorder != null)
