@@ -53,6 +53,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>ConfigurationStg.Designer.cs</LastGenOutput>
     </None>
+    <None Update="ReadMe.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <!--<ItemGroup>
