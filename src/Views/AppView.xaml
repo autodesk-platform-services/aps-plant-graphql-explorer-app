@@ -20,7 +20,7 @@
         </Grid.RowDefinitions>
         
         <TextBlock Grid.Row="0"
-                   Text="GraphQL Client"
+                   Text="Plant 3D AEC DM Explorer"
                    FontSize="24"
                    FontWeight="Bold"
                    HorizontalAlignment="Center"

@@ -75,13 +75,13 @@ namespace GraphQLClient.Views
 
             // schemas
             //
-            _schemaObject = GetResource<SchemaObject>("pack://application:,,,/Schema.json");
+            _schemaObject = GetResource<SchemaObject>("pack://application:,,,/Data/Schema.json");
             SchemaGroups = _schemaObject.Data.Select(c => c.GroupName).ToList();
             SchemaGroups.Sort();
 
             // examples
             //
-            _examplesObject = GetResource<ExamplesObject>("pack://application:,,,/Examples.json");
+            _examplesObject = GetResource<ExamplesObject>("pack://application:,,,/Data/Examples.json");
 
             _filteredSuggestions = CollectionViewSource.GetDefaultView(_searchHints);
             _filteredSuggestions.Filter = FilterSuggestion;
