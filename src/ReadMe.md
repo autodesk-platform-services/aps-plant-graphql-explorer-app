@@ -26,7 +26,7 @@ This repository helps you set up **Plant 3D AEC Data Model (AECDM) Explorer** OA
 
 To use APS APIs, you must create an application and obtain OAuth credentials.
 
-1. Sign in to the **APS Developer Portal**
+1. Sign in to the [**APS Developer Portal**](https://https://aps.autodesk.com)
 2. Open **Applications** from your profile menu
 3. Click **Create application**
 4. Enter an application name and select the appropriate application type (for example, **Web App**)
@@ -51,6 +51,8 @@ To use APS APIs, you must create an application and obtain OAuth credentials.
 ## Step 2 — Configure This Tool
 
 Your OAuth configuration depends on the application type you created.
+In this example, **Option A** is used.  
+**Option B** can also be used with this sample application, depending on the application type.
 
 ### Option A — OAuth (Client Secret)
 
@@ -101,7 +103,7 @@ Select the data source to query:
 - 3D Model
 - P&ID
 
-#### Plant 3D References
+#### Parameter Categories
 
 The dropdown contains three sections:
 
