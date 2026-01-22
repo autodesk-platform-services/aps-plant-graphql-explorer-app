@@ -6,18 +6,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>Resources\launch.ico</ApplicationIcon>
     <Version>1.0.14</Version>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\launch.png" />
     <None Remove="Schema.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\launch.ico">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Resources\launch.png" />
     <Resource Include="Resources\project.tif">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

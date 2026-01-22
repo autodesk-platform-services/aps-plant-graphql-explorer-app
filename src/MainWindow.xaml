@@ -8,7 +8,7 @@
         Title="Plant 3D AEC DM Explorer"
         Height="700" Width="1000"
         MinHeight="100" MinWidth="300"
-        Icon="/Resources/launch.ico"
+        Icon="/Resources/launch.png"
         WindowStartupLocation="CenterScreen"
         SizeToContent="Manual"
         Loaded="Window_Loaded">
