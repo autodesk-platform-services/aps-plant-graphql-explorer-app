@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace GraphQLClient.Views
+﻿namespace GraphQLClient.Views
 {
     internal interface IFresh
     {

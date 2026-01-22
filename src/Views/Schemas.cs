@@ -1,12 +1,4 @@
-﻿using GraphQLClient.Data;
-using System;
-using System.Collections.Generic;
-using System.Net.Mime;
-using System.Text;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Xml.Linq;
-
+﻿
 namespace GraphQLClient.Views
 {
     public static class Schemas

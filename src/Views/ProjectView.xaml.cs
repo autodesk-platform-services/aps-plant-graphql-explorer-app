@@ -1,21 +1,9 @@
 ﻿using GraphQLClient.Commands;
 using GraphQLClient.Data;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
 
 namespace GraphQLClient.Views
 {
@@ -37,6 +25,17 @@ namespace GraphQLClient.Views
 
         public override ViewTypes ViewType => ViewTypes.Projects;
         public override Task LoadData() => LoadProjectsAsync();
+        public override string ViewTitle => "ACC projects:";
+        public override string BackButtonTitle => "<< Choose ACC Account";
+        public override Action NextButtonAcion => () =>
+        {
+            var selectedProject = projects.SelectedItem as Project;
+            if (selectedProject != null)
+            {
+                NextView(selectedProject);
+            }
+        };
+
         public override Task FreshView()
         {
             _projects.Clear();
@@ -80,16 +79,21 @@ namespace GraphQLClient.Views
         {
             if (sender is ListView listView && listView.SelectedItem is Project selectedProject)
             {
-                if (_folderViewCache.ContainsKey(selectedProject.Id))
-                {
-                    _appView.SetView(_folderViewCache[selectedProject.Id]);
-                    return;
-                }
-
-                var projView = new FolderView(_appView, this, selectedProject.Id, selectedProject.AlternativeIdentifiers.DataManagementAPIProjectId);
-                _folderViewCache[selectedProject.Id] = projView;
-                _appView.SetView(projView);
+                NextView(selectedProject);
             }
+        }
+
+        private void NextView(Project selectedProject)
+        {
+            if (_folderViewCache.ContainsKey(selectedProject.Id))
+            {
+                _appView.SetView(_folderViewCache[selectedProject.Id]);
+                return;
+            }
+
+            var projView = new FolderView(_appView, this, selectedProject.Id, selectedProject.AlternativeIdentifiers.DataManagementAPIProjectId);
+            _folderViewCache[selectedProject.Id] = projView;
+            _appView.SetView(projView);
         }
     }
 }

@@ -1,15 +1,12 @@
 ﻿using GraphQLClient.Commands;
 using GraphQLClient.Data;
 using Microsoft.Win32;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -52,8 +49,12 @@ namespace GraphQLClient.Views
         public List<string> SchemaGroups { get; set; }
 
         public override ViewTypes ViewType => ViewTypes.Search;
-        //public override Task LoadData() => LoadSearchResultsAsync();
-        //public override Task FreshView() => LoadSearchResultsAsync();
+        public override string BackButtonTitle => "<< Choose project";
+        public override string NextButtonTitle => "Export CSV...";
+        public override Action NextButtonAcion => () =>
+        {
+            ExportButton();
+        };
 
         public bool IsSuggestionsOpen
         {
@@ -224,7 +225,7 @@ namespace GraphQLClient.Views
             }
         }
 
-        private async void ExportButton_Click(object sender, RoutedEventArgs e)
+        private async void ExportButton()
         {
             var source = resultsDataGrid.ItemsSource as DataView;
             if (source == null || source.Count == 0 || source.Table == null || source.Table.Columns.Count == 0)

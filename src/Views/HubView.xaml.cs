@@ -2,7 +2,6 @@
 using GraphQLClient.Data;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -26,6 +25,15 @@ namespace GraphQLClient.Views
         public override ViewTypes ViewType => ViewTypes.Hubs;
         public override Task LoadData() => LoadHubsAsync();
         public override Task FreshView() => LoadHubsAsync();
+        public override string ViewTitle => "ACC account:";
+        public override Action NextButtonAcion => () =>
+        {
+            var selectedHub = hubs.SelectedItem as Hub;
+            if (selectedHub != null)
+            {
+                NextView(selectedHub.Id);
+            }
+        };
 
         private ObservableCollection<Hub> _hubs = new ObservableCollection<Hub>();
         public ObservableCollection<Hub> Hubs
@@ -64,16 +72,21 @@ namespace GraphQLClient.Views
         {
             if (sender is ListView listView && listView.SelectedItem is Hub selectedHub)
             {
-                if (_projectViewCache.ContainsKey(selectedHub.Id))
-                {
-                    _appView.SetView(_projectViewCache[selectedHub.Id]);
-                    return;
-                }
-
-                var projView = new ProjectsView(_appView, this, selectedHub.Id);
-                _projectViewCache[selectedHub.Id] = projView;
-                _appView.SetView(projView);
+                NextView(selectedHub.Id);
             }
+        }
+
+        private void NextView(string hubId)
+        {
+            if (_projectViewCache.ContainsKey(hubId))
+            {
+                _appView.SetView(_projectViewCache[hubId]);
+                return;
+            }
+
+            var projView = new ProjectsView(_appView, this, hubId);
+            _projectViewCache[hubId] = projView;
+            _appView.SetView(projView);
         }
 
     }
