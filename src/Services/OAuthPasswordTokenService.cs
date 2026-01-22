@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Windows;
 using GraphQLClient.Views;
@@ -81,21 +75,6 @@ namespace GraphQLClient.Services
             listener.Start();
 
             await CreatePKCEURL(listener, _oAuthType, cancellationToken);
-            //var pkce = CreatePkceData();
-            //var authorizeUrl = BuildAuthorizeUrl(pkce);
-
-            //Process.Start(new ProcessStartInfo(authorizeUrl) { UseShellExecute = true });
-
-            //try
-            //{
-            //    var code = await WaitForAuthorizationCodeAsync(listener, pkce.State, cancellationToken).ConfigureAwait(false);
-            //    var result = await RedeemAuthorizationCodeAsync(code, pkce, cancellationToken).ConfigureAwait(false);
-            //    CacheToken(result);
-            //}
-            //finally
-            //{
-            //    listener.Stop();
-            //}
             return _accessToken!;
         }
 
@@ -107,13 +86,6 @@ namespace GraphQLClient.Services
             {
                 Content = new FormUrlEncodedContent(BuildRefreshRequestBody(refreshToken)),
             };
-
-            //// If you have a client secret, stick with HTTP Basic; do NOT duplicate client_id in the body.
-            //if (!string.IsNullOrWhiteSpace(_options.ClientSecret))
-            //{
-            //    var credentials = Encoding.UTF8.GetBytes($"{_options.ClientId}:{_options.ClientSecret}");
-            //    request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(credentials));
-            //}
 
             using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             var payload = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using GraphQLClient.Commands;
 using GraphQLClient.Services;
 using GraphQLClient.Views;
 
@@ -25,13 +21,10 @@ namespace GraphQLClient
         }
 
         private LoginView LoginView => LoginViewControl;
-        //private AppView AppView => AppViewControl;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             LoginView.LoginClicked += LoginView_LoginClicked;
-            //AppView.SearchClicked += AppView_SearchClicked;
-            //AppView.CopyTokenClicked += CopyTokenButton_Click;
         }
 
         private async Task AttemptLoginAsync()
@@ -69,7 +62,6 @@ namespace GraphQLClient
             LoginView.LoginButtonControl.IsEnabled = !isBusy;
             LoginView.EnvironmentComboBoxControl.IsEnabled = !isBusy;
             LoginView.LoginProgressBarControl.Visibility = isBusy ? Visibility.Visible : Visibility.Collapsed;
-            //AppView.CopyTokenButtonControl.IsEnabled = !isBusy && AppView.TokenPanelControl.Visibility == Visibility.Visible && !string.IsNullOrWhiteSpace(AppView.AccessTokenTextBoxControl.Text);
         }
 
         private void ShowStatus(string message, Brush brush)
@@ -82,11 +74,7 @@ namespace GraphQLClient
         {
             _loginCancellation?.Cancel();
             _loginCancellation?.Dispose();
-
             LoginView.LoginClicked -= LoginView_LoginClicked;
-            //AppView.SearchClicked -= AppView_SearchClicked;
-            //AppView.CopyTokenClicked -= CopyTokenButton_Click;
-
             _tokenService?.Dispose();
 
             base.OnClosed(e);
@@ -100,28 +88,10 @@ namespace GraphQLClient
                     ? $"Token request failed ({result.StatusCode})."
                     : result.ErrorMessage;
                 ShowStatus(message, Brushes.OrangeRed);
-                //AppView.TokenPanelControl.Visibility = Visibility.Collapsed;
-                //AppView.AccessTokenTextBoxControl.Text = string.Empty;
-                //AppView.TokenMetadataTextBlockControl.Text = string.Empty;
-                //AppView.CopyTokenButtonControl.IsEnabled = false;
                 return;
             }
 
             ShowAppView();
-            //AppView.AccessTokenTextBoxControl.Text = result.AccessToken;
-            //AppView.TokenPanelControl.Visibility = Visibility.Visible;
-
-            // var expiresInfo = result.ExpiresIn.HasValue
-            //     ? $"expires in {TimeSpan.FromSeconds(result.ExpiresIn.Value).Minutes:D2}:{TimeSpan.FromSeconds(result.ExpiresIn.Value).Seconds:D2}"
-            //     : "no expiry provided";
-
-            // //AppView.TokenMetadataTextBlockControl.Text = $"Type: {result.TokenType}, {expiresInfo}";
-            // //ShowStatus("Access token issued.", Brushes.SeaGreen);
-            // //AppView.CopyTokenButtonControl.IsEnabled = true;
-
-            // LoginView.Visibility = Visibility.Collapsed;
-            // AppView.Visibility = Visibility.Visible;
-            //// AppView.AppStatusTextBlockControl.Text = $"Authenticated as {result.TokenType} token";
         }
 
         private void ShowAppView()
@@ -147,30 +117,6 @@ namespace GraphQLClient
             {
                 ShowStatus($"{ex.Message}", Brushes.OrangeRed);
             }
-        }
-
-        private void AppView_SearchClicked(object? sender, RoutedEventArgs e)
-        {
-            //AppView.SearchResultsTextBlockControl.Text = "Search executed (stub).";
-        }
-
-        private GraphQLEnvironment GetSelectedEnvironment()
-        {
-            if (LoginView.EnvironmentComboBoxControl.SelectedItem is ComboBoxItem item && item.Tag is string tag)
-            {
-                return Enum.TryParse<GraphQLEnvironment>(tag, out var env) ? env : GraphQLEnvironment.Staging;
-            }
-
-            return GraphQLEnvironment.Staging;
-        }
-
-        private void CopyTokenButton_Click(object? sender, RoutedEventArgs e)
-        {
-            //if (!string.IsNullOrWhiteSpace(AppView.AccessTokenTextBoxControl.Text))
-            //{
-            //    Clipboard.SetText(AppView.AccessTokenTextBoxControl.Text);
-            //    ShowStatus("Access token copied to clipboard.", Brushes.DodgerBlue);
-            //}
         }
     }
 }

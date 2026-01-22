@@ -1,7 +1,3 @@
-using System;
-using System.Reflection.Metadata;
-using static System.Net.WebRequestMethods;
-
 namespace GraphQLClient.Services
 {
     internal sealed class OAuthClientOptions
