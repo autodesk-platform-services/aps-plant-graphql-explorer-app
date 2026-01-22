@@ -41,6 +41,18 @@ namespace GraphQLClient.Views
 
         public override ViewTypes ViewType => ViewTypes.Folder;
         public override Task LoadData() => LoadFoldersAsync();
+        public override string ViewTitle => "Plant 3D projectss:";
+        public override string BackButtonTitle => "<< Choose ACC project";
+        public override Action NextButtonAcion => async () =>
+        {
+            var selectedFolder = folders.SelectedItem as Folder;
+            if (selectedFolder != null)
+            {
+                _folderUrn = selectedFolder.Id;
+                await LoadFoldersAsync(selectedFolder);
+            }
+        };
+
         public override Task FreshView()
         {
             _folders.Clear();

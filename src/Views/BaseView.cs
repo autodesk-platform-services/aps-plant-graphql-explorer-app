@@ -27,6 +27,11 @@ namespace GraphQLClient.Views
         public virtual ViewTypes ViewType => ViewTypes.None;
         public virtual Task LoadData() => Task.CompletedTask;
         public virtual Task FreshView() => Task.CompletedTask;
+        public virtual string ViewTitle => string.Empty;
+        public virtual string BackButtonTitle => string.Empty;
+        public virtual string NextButtonTitle => "Next";
+        public virtual Action NextButtonAcion => () => { };
+
 
         public BaseView? ParentView { get; private set; } = null;
 

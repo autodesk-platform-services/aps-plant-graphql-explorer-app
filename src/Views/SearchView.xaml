@@ -110,13 +110,12 @@
                    FontSize="12"
                    Margin="10" />
 
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
+            <!--<Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="50" />
-            </Grid.RowDefinitions>
+            </Grid.RowDefinitions>-->
 
-            <Grid Grid.Row="0">
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="230" x:Name="leftColumn" />
                     <ColumnDefinition Width="50"/>
@@ -253,6 +252,7 @@
                         HorizontalAlignment="Right"
                         Width="122" Height="25" 
                         Background="#0696D7"
+                        Foreground="White"
                         Click="SearchButton_Click" />
                     </Grid>
 
@@ -313,26 +313,22 @@
                 </Grid>
             </Grid>
 
-            <Grid Grid.Row="1">
+            <!--<DockPanel Grid.Row="1">
                 <Button Content="&lt;&lt; Choose project"
                     Margin="10"
-                    HorizontalAlignment="Left"
-                    Width="138" Height="25"
-                    Background="Transparent"
-                    BorderBrush="Gray"
-                    BorderThickness="1"
+                    DockPanel.Dock="Left"
+                    Style="{StaticResource OutlineButtonStyle}"
+                    Width="138"
                     Click="ChooseProject_Click"/>
                 <Button 
                     Margin="10" 
                     Content="Export CSV"
-                    Width="122" Height="25"
-                    HorizontalAlignment="Right"
-                    Background="Transparent"
-                    BorderBrush="Gray"
-                    BorderThickness="1"
+                    Style="{StaticResource OutlineButtonStyle}"
+                    Width="122"
+                    DockPanel.Dock="Right"
                     Click="ExportButton_Click" />
-            </Grid>
-        </Grid>
+                <Grid/>
+            </DockPanel>-->
     </Grid>
 
 </local:BaseView>

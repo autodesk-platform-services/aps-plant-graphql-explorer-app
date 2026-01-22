@@ -52,6 +52,11 @@ namespace GraphQLClient.Views
         {
             SetView(_currentFreshView.ParentView!);
         }
+
+        private void nextButton_Click(object sender, RoutedEventArgs e)
+        {
+            _currentFreshView.NextButtonAcion();
+        }
     }
 }
 
