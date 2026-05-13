@@ -99,7 +99,10 @@ namespace GraphQLClient.Views
 
                             var tasks = folders.Where(c => c.IsPlantProject).Select(async c =>
                             {
-                                var (pidUrn, p3dUrn) = await GetPlantFilePulsFolderUrns(c);
+                                //var (pidUrn, p3dUrn) = await GetPlantFilePulsFolderUrns(c);
+                                var (pidfoldUrn, p3dfolderUrn) = await DocsRequest.Instance.FindFilePlusFoldersAsync(c.Id, _dmProjectId);
+                                var pidUrn = await PlantDMRequest.Instance.GetFilePlusDataAsync(pidfoldUrn, _dmProjectId);
+                                var p3dUrn = await PlantDMRequest.Instance.GetFilePlusDataAsync(p3dfolderUrn, _dmProjectId);
                                 c.PIDDataset = pidUrn;
                                 c.PipingDataset = p3dUrn;
                             });
@@ -125,7 +128,10 @@ namespace GraphQLClient.Views
                             await CheckPlantProjectFoldersAsync(folders);
                             var tasks = folders.Where(c => c.IsPlantProject).Select(async c =>
                             {
-                                var (pidUrn, p3dUrn) = await GetPlantFilePulsFolderUrns(c);
+                                //var (pidUrn, p3dUrn) = await GetPlantFilePulsFolderUrns(c);
+                                var (pidfoldUrn, p3dfolderUrn) = await DocsRequest.Instance.FindFilePlusFoldersAsync(c.Id, _dmProjectId);
+                                var pidUrn = await PlantDMRequest.Instance.GetFilePlusDataAsync(pidfoldUrn, _dmProjectId);
+                                var p3dUrn = await PlantDMRequest.Instance.GetFilePlusDataAsync(p3dfolderUrn, _dmProjectId);
                                 c.PIDDataset = pidUrn;
                                 c.PipingDataset = p3dUrn;
                             });

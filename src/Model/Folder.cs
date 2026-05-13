@@ -58,7 +58,7 @@ namespace GraphQLClient.Data
 
         private string _pipingDataset = string.Empty;
         [JsonIgnore]
-        public string PipingDataset
+        public string? PipingDataset
         {
             get => _pipingDataset;
             set
@@ -75,7 +75,7 @@ namespace GraphQLClient.Data
 
         private string _pidDataset = string.Empty;
         [JsonIgnore]
-        public string PIDDataset
+        public string? PIDDataset
         {
             get => _pidDataset;
             set
