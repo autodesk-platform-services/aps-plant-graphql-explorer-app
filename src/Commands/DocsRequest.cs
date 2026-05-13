@@ -1,5 +1,5 @@
-﻿using GraphQLClient.Services;
-using System;
+﻿using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -7,32 +7,25 @@ using System.Text.Json;
 
 namespace GraphQLClient.Commands
 {
-    public sealed class DocsRequest : Request
+    public class DocsRequest : Request
     {
         private static readonly Lazy<DocsRequest> _instance = new(() => new DocsRequest());
 
         private DocsRequest()
-            : base("https://developer-stg.api.autodesk.com/dm/v3/projects/{0}/entities:search",
-                   "https://developer.api.autodesk.com/dm/v3/projects/{0}/entities:search")
+            : base("https://developer-stg.api.autodesk.com/data/v1/projects/{0}/folders/{1}/search?filter[displayName]=PipingPart.xml",
+                   "https://developer.api.autodesk.com/data/v1/projects/{0}/folders/{1}/search?filter[displayName]=PipingPart.xml")
         {
         }
 
         public static DocsRequest Instance => _instance.Value;
 
-        public override async Task<T> QueryAsync<T>(string query, dynamic? variables = null, CancellationToken cancellationToken = default)
+        public async Task<bool> FindItemByNameAsync(string folderUrn, string projectId, CancellationToken cancellationToken = default)
         {
             var token = await TokenService.RequestTokenAsync(cancellationToken).ConfigureAwait(false);
 
-            if (variables == null)
+            var baseUrl = string.Format(BaseUrl, projectId, folderUrn);
+            using var message = new HttpRequestMessage(HttpMethod.Get, baseUrl)
             {
-                throw new ArgumentNullException(nameof(variables), "Project ID must be provided in variables.");
-            }
-
-            var projectId = variables as string;
-            var baseUrl = string.Format(BaseUrl, projectId.Substring(projectId.IndexOf('.') + 1));
-            using var message = new HttpRequestMessage(HttpMethod.Post, baseUrl)
-            {
-                Content = new StringContent(query, Encoding.UTF8, "application/json"),
                 Headers =
                 {
                     { "Authorization", $"Bearer {token.AccessToken}" },
@@ -53,8 +46,26 @@ namespace GraphQLClient.Commands
                 throw new Exception("GraphQL response payload is empty.");
             }
 
-            var result = JsonSerializer.Deserialize<T>(payload) ?? throw new Exception("Failed to deserialize GraphQL response.");
-            return result;
+            using var doc = JsonDocument.Parse(payload);
+            if (!doc.RootElement.TryGetProperty("data", out var data) || data.ValueKind != JsonValueKind.Array)
+            {
+                throw new Exception("GraphQL response does not contain a valid 'data' array.");
+            }
+
+            foreach (var item in data.EnumerateArray())
+            {
+                if (!item.TryGetProperty("attributes", out var attrs)) continue;
+                if (!attrs.TryGetProperty("displayName", out var nameProp)) continue;
+
+                var displayName = nameProp.GetString();
+                if (string.Equals(displayName, "PipingPart.xml", StringComparison.OrdinalIgnoreCase))
+                {
+                    var id = item.TryGetProperty("id", out var idProp) ? idProp.GetString() : null;
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

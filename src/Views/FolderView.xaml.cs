@@ -167,21 +167,16 @@ namespace GraphQLClient.Views
 
             var requestFunc = async (Folder folder) =>
             {
-                var requestBody = new
-                {
-                    folderUrns = new string[] { folder.Id },
-                    searchText = "PipingPart.xml",
-                    recursive = false
-                };
-                var query = JsonSerializer.Serialize(requestBody);
+                //var requestBody = new
+                //{
+                //    folderUrns = new string[] { folder.Id },
+                //    searchText = "PipingPart.xml",
+                //    recursive = false
+                //};
+                //var query = JsonSerializer.Serialize(requestBody);
                 try
                 {
-
-                    var result = await DocsRequest.Instance.QueryAsync<FilePlus>(query, _dmProjectId);
-                    if (result.Documents.Count > 0)
-                    {
-                        folder.IsPlantProject = true;
-                    }
+                    folder.IsPlantProject = await DocsRequest.Instance.FindItemByNameAsync(folder.Id, _dmProjectId);
                 }
                 catch (Exception)
                 {
@@ -224,7 +219,7 @@ namespace GraphQLClient.Views
             };
             var query = JsonSerializer.Serialize(requestBody);
 
-            var filePlus = await DocsRequest.Instance.QueryAsync<FilePlus>(query, _dmProjectId);
+            var filePlus = await DMRequest.Instance.QueryAsync<FilePlus>(query, _dmProjectId);
             foreach (var doc in filePlus.Documents)
             {
                 if (string.Compare(doc.Name, "P&ID Data Set", StringComparison.OrdinalIgnoreCase) == 0)
