@@ -37,8 +37,9 @@ namespace GraphQLClient.Commands
 
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadAsStringAsync();
-            }    
+                var val = await response.Content.ReadAsStringAsync();
+                return val.Trim('"');
+            }
             return null;
         }
     }

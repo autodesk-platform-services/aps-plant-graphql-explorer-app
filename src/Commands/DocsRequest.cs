@@ -24,7 +24,7 @@ namespace GraphQLClient.Commands
             var token = await TokenService.RequestTokenAsync(cancellationToken).ConfigureAwait(false);
 
             var baseUrl = string.Format(BaseUrl, projectId, folderUrn);
-            using var message = new HttpRequestMessage(HttpMethod.Get, baseUrl + "/search?filter[displayName]=PipingPart.xml")
+            using var message = new HttpRequestMessage(HttpMethod.Get, baseUrl + "/contents?filter[displayName]=PipingPart.xml")
             {
                 Headers =
                 {
