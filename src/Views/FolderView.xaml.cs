@@ -76,11 +76,11 @@ namespace GraphQLClient.Views
                 IsLoading = true;
                 if (current != null && current.IsPlantProject)
                 {
-                    if (current.PIDDataset != null || current.PipingDataset != null)
+                    if (current.PIDElementGroupId != null || current.P3DElementGroupId != null)
                     {
                         // show earch view
                         //
-                        _appView.SetView(new SearchView(_appView, this, _projectId, current.PIDDataset, current.PipingDataset));
+                        _appView.SetView(new SearchView(_appView, this, _projectId, current.PIDElementGroupId, current.P3DElementGroupId));
                     }
                 }
                 else
@@ -97,15 +97,7 @@ namespace GraphQLClient.Views
                         {
                             await CheckPlantProjectFoldersAsync(folders);
 
-                            var tasks = folders.Where(c => c.IsPlantProject).Select(async c =>
-                            {
-                                //var (pidUrn, p3dUrn) = await GetPlantFilePulsFolderUrns(c);
-                                var (pidfoldUrn, p3dfolderUrn) = await DocsRequest.Instance.FindFilePlusFoldersAsync(c.Id, _dmProjectId);
-                                var pidUrn = await PlantDMRequest.Instance.GetFilePlusDataAsync(pidfoldUrn, _dmProjectId);
-                                var p3dUrn = await PlantDMRequest.Instance.GetFilePlusDataAsync(p3dfolderUrn, _dmProjectId);
-                                c.PIDDataset = pidUrn;
-                                c.PipingDataset = p3dUrn;
-                            });
+                            var tasks = folders.Where(c => c.IsPlantProject).Select(c => SetDMItems(c));
                             await Task.WhenAll(tasks);
 
                             Folders.Clear();
@@ -126,15 +118,7 @@ namespace GraphQLClient.Views
                         if (folders != null)
                         {
                             await CheckPlantProjectFoldersAsync(folders);
-                            var tasks = folders.Where(c => c.IsPlantProject).Select(async c =>
-                            {
-                                //var (pidUrn, p3dUrn) = await GetPlantFilePulsFolderUrns(c);
-                                var (pidfoldUrn, p3dfolderUrn) = await DocsRequest.Instance.FindFilePlusFoldersAsync(c.Id, _dmProjectId);
-                                var pidUrn = await PlantDMRequest.Instance.GetFilePlusDataAsync(pidfoldUrn, _dmProjectId);
-                                var p3dUrn = await PlantDMRequest.Instance.GetFilePlusDataAsync(p3dfolderUrn, _dmProjectId);
-                                c.PIDDataset = pidUrn;
-                                c.PipingDataset = p3dUrn;
-                            });
+                            var tasks = folders.Where(c => c.IsPlantProject).Select(c => SetDMItems(c));
                             await Task.WhenAll(tasks);
 
                             current.Children = new List<Folder>(folders);
@@ -150,6 +134,54 @@ namespace GraphQLClient.Views
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        private async Task SetDMItems(Folder c)
+        {
+            var (pidfoldUrn, p3dfolderUrn) = await DocsRequest.Instance.FindFilePlusFoldersAsync(c.Id, _dmProjectId);
+            //var pidUrn = await PlantDMRequest.Instance.GetFilePlusDataAsync(pidfoldUrn, _dmProjectId);
+            //var p3dUrn = await PlantDMRequest.Instance.GetFilePlusDataAsync(p3dfolderUrn, _dmProjectId);
+            var folderUrns = await Task.WhenAll(
+                PlantDMRequest.Instance.GetFilePlusDataAsync(pidfoldUrn, _dmProjectId),
+                PlantDMRequest.Instance.GetFilePlusDataAsync(p3dfolderUrn, _dmProjectId)
+            );
+
+            var (pidUrn, p3dUrn) = (folderUrns[0], folderUrns[1]);
+            if (string.IsNullOrEmpty(pidUrn) || string.IsNullOrEmpty(p3dUrn))
+            {
+                return;
+            }
+
+            var groups = await Task.WhenAll(GetGroupElement(pidfoldUrn), GetGroupElement(p3dfolderUrn));
+            var (pidGroupId, p3dGroupId) = (groups[0], groups[1]);
+            if (!string.IsNullOrEmpty(pidGroupId) && !string.IsNullOrEmpty(p3dGroupId))
+            {
+                c.PIDElementGroupId = pidGroupId;
+                c.P3DElementGroupId = p3dGroupId;
+            }
+        }
+
+        private async Task<string> GetGroupElement(string folderUrn)
+        {
+            try
+            {
+                var response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<ElementGroupData>>(QueryCommands.Query_ElementGroup,
+                    new { projectId = _projectId, folderId = folderUrn, filter = new { searchType = "ALL" } });
+
+                if (response?.Data?.ElementGroups?.Results != null)
+                {
+                    foreach (var elementGroup in response.Data.ElementGroups.Results)
+                    {
+                        return elementGroup.Id;
+                    }
+                }
+                return string.Empty;
+            }
+            catch (Exception)
+            {
+
+                throw;
             }
         }
 
