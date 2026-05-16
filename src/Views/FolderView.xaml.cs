@@ -76,7 +76,7 @@ namespace GraphQLClient.Views
                 IsLoading = true;
                 if (current != null && current.IsPlantProject)
                 {
-                    if (current.PIDElementGroupId != null || current.P3DElementGroupId != null)
+                    if (!string.IsNullOrEmpty(current.PIDElementGroupId) && !string.IsNullOrEmpty(current.P3DElementGroupId))
                     {
                         // show earch view
                         //
