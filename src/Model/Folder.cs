@@ -56,16 +56,16 @@ namespace GraphQLClient.Data
             }
         }
 
-        private string _pipingDataset = string.Empty;
+        private string _p3dElementGroupId = string.Empty;
         [JsonIgnore]
-        public string PipingDataset
+        public string? P3DElementGroupId
         {
-            get => _pipingDataset;
+            get => _p3dElementGroupId;
             set
             {
-                if (!string.Equals(_pipingDataset, value, StringComparison.Ordinal))
+                if (!string.Equals(_p3dElementGroupId, value, StringComparison.Ordinal))
                 {
-                    _pipingDataset = value ?? string.Empty;
+                    _p3dElementGroupId = value ?? string.Empty;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(HasPipingDataset));
                     OnPropertyChanged(nameof(ProjectIconBrush));
@@ -73,16 +73,16 @@ namespace GraphQLClient.Data
             }
         }
 
-        private string _pidDataset = string.Empty;
+        private string _pidElementGroupId = string.Empty;
         [JsonIgnore]
-        public string PIDDataset
+        public string? PIDElementGroupId
         {
-            get => _pidDataset;
+            get => _pidElementGroupId;
             set
             {
-                if (!string.Equals(_pidDataset, value, StringComparison.Ordinal))
+                if (!string.Equals(_pidElementGroupId, value, StringComparison.Ordinal))
                 {
-                    _pidDataset = value ?? string.Empty;
+                    _pidElementGroupId = value ?? string.Empty;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(HasPIDDataset));
                     OnPropertyChanged(nameof(ProjectIconBrush));
@@ -91,10 +91,10 @@ namespace GraphQLClient.Data
         }
 
         [JsonIgnore]
-        public bool HasPipingDataset => !string.IsNullOrWhiteSpace(_pipingDataset);
+        public bool HasPipingDataset => !string.IsNullOrWhiteSpace(_p3dElementGroupId);
 
         [JsonIgnore]
-        public bool HasPIDDataset => !string.IsNullOrWhiteSpace(_pidDataset);
+        public bool HasPIDDataset => !string.IsNullOrWhiteSpace(_pidElementGroupId);
 
         private static readonly SolidColorBrush MissingDatasetBrush = new SolidColorBrush(Color.FromRgb(220, 38, 38));
 

@@ -21,9 +21,6 @@ namespace GraphQLClient.Views
     public partial class SearchView : BaseView
     {
         private readonly string _projectId;
-        private readonly string? _folder2dUrn;
-        private readonly string? _folder3dUrn;
-        private string? _currentPartTypeUrn;
         private bool _isLoading;
         private bool _suppressSuggestionRefresh;
         private readonly ObservableCollection<string> _searchHints = new(Schemas.SchemaList);
@@ -34,6 +31,22 @@ namespace GraphQLClient.Views
         private TextPointer? _tokenEndPointer;
         private SchemaObject _schemaObject;
         private ExamplesObject _examplesObject;
+
+        private SearchInfo _currentSearchInfo;
+        private SearchInfo _pidSearchInfo;
+        private SearchInfo _p3dsearchInfo;
+
+        private enum SearchType
+        {
+            PID,
+            P3D
+        }
+
+        private class SearchInfo
+        {
+            public string? ElementGroupId { get; set; }
+            public SearchType SearchType { get; set; }
+        }
 
         public bool IsLoading
         {
@@ -69,7 +82,7 @@ namespace GraphQLClient.Views
             }
         }
 
-        public SearchView(AppView appView, BaseView parentView, string projectId, string? folder2dUrn, string? folder3dUrn)
+        public SearchView(AppView appView, BaseView parentView, string projectId, string? pidGroupId, string? p3dGroupId)
             : base(appView, parentView)
         {
             InitializeComponent();
@@ -88,8 +101,8 @@ namespace GraphQLClient.Views
             _filteredSuggestions.Filter = FilterSuggestion;
             DataContext = this;
             _projectId = projectId;
-            _folder2dUrn = folder2dUrn;
-            _folder3dUrn = folder3dUrn;
+            _pidSearchInfo = new SearchInfo { SearchType = SearchType.PID, ElementGroupId = pidGroupId };
+            _p3dsearchInfo = new SearchInfo { SearchType = SearchType.P3D, ElementGroupId = p3dGroupId };
             referenceCombobox.SelectedIndex = 0;
             partTypeCombobox.SelectedIndex = 0;
         }
@@ -221,7 +234,7 @@ namespace GraphQLClient.Views
             if (e.AddedItems.Count > 0)
             {
                 var selectedPartType = (e.AddedItems[0] as ComboBoxItem)?.Content?.ToString();
-                _currentPartTypeUrn = string.Compare(selectedPartType, "3D Model", StringComparison.OrdinalIgnoreCase) == 0 ? _folder3dUrn : _folder2dUrn;
+                _currentSearchInfo = string.Compare(selectedPartType, "3D Model", StringComparison.OrdinalIgnoreCase) == 0 ? _p3dsearchInfo : _pidSearchInfo;
             }
         }
 
@@ -263,33 +276,37 @@ namespace GraphQLClient.Views
             await LoadSearchResultsAsync();
         }
 
-        private async Task<string> GetGroupElement(string folderUrn)
-        {
-            try
-            {
-                string elementGroupId = string.Empty;
-                var response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<ElementGroupData>>(QueryCommands.Query_ElementGroup,
-                    new { projectId = _projectId, folderId = folderUrn, filter = new { searchType = "ALL" } });
+        //private async Task GetGroupElement(string folderUrn)
+        //{
+        //    try
+        //    {
+        //        if (!string.IsNullOrEmpty(_currentSearchInfo.ElementGroupId))
+        //        {
+        //            return;
+        //        }
 
-                if (response?.Data?.ElementGroups?.Results != null)
-                {
-                    foreach (var elementGroup in response.Data.ElementGroups.Results)
-                    {
-                        elementGroupId = elementGroup.Id;
-                    }
-                }
-                return elementGroupId;
-            }
-            catch (Exception)
-            {
+        //        var response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<ElementGroupData>>(QueryCommands.Query_ElementGroup,
+        //            new { projectId = _projectId, folderId = folderUrn, filter = new { searchType = "ALL" } });
 
-                throw;
-            }
-        }
+        //        if (response?.Data?.ElementGroups?.Results != null)
+        //        {
+        //            foreach (var elementGroup in response.Data.ElementGroups.Results)
+        //            {
+        //                _currentSearchInfo.ElementGroupId = elementGroup.Id;
+        //                break;
+        //            }
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+
+        //        throw;
+        //    }
+        //}
 
         private async Task LoadSearchResultsAsync()
         {
-            if (string.IsNullOrEmpty(_currentPartTypeUrn))
+            if (string.IsNullOrEmpty(_currentSearchInfo.ElementGroupId))
             {
                 return;
             }
@@ -297,9 +314,8 @@ namespace GraphQLClient.Views
             IsLoading = true;
             try
             {
-                var elementGroupId = await GetGroupElement(_currentPartTypeUrn);
-                var searchTerm = GetSearchText();
-                await SearchDataAsync(elementGroupId, searchTerm);
+                //await GetGroupElement(_currentSearchInfo.FolderUrn);
+                await SearchDataAsync(GetSearchText());
             }
             finally
             {
@@ -307,11 +323,11 @@ namespace GraphQLClient.Views
             }
         }
 
-        private async Task SearchDataAsync(string elementGroupId, string searchTerm)
+        private async Task SearchDataAsync(string searchTerm)
         {
             try
             {
-                var table = await Task.Run(() => BuildTable(elementGroupId, searchTerm));
+                var table = await Task.Run(() => BuildTable(_currentSearchInfo.ElementGroupId, searchTerm));
 
                 Dispatcher.Invoke(() =>
                 {
@@ -326,7 +342,7 @@ namespace GraphQLClient.Views
             }
         }
 
-        private async Task<DataTable> BuildTable(string elementGroupId, string searchTerm)
+        private async Task<DataTable> BuildTable(string? elementGroupId, string searchTerm)
         {
             var dataTable = new DataTable();
             var response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<SearchData>>(QueryCommands.Query_SearchElements,
