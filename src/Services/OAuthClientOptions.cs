@@ -51,7 +51,7 @@ namespace GraphQLClient.Services
                     Authorize = "https://developer.api.autodesk.com/authentication/v2/authorize",
                     Token = "https://developer.api.autodesk.com/authentication/v2/token",
                     ClientId = oAuthType == OAuthType.OAuth ? Configuration.Default.ClientID : Configuration.Default.ClientID_PKCE,
-                    ClientSecret = oAuthType == OAuthType.OAuth ? ConfigurationStg.Default.ClientSecret : null,
+                    ClientSecret = oAuthType == OAuthType.OAuth ? Configuration.Default.ClientSecret : null,
                     Callback = oAuthType == OAuthType.OAuth ? Configuration.Default.CallbackURL : Configuration.Default.CallbackURL_PKCE
                 },
                 _ => throw new ArgumentOutOfRangeException(nameof(environment), environment, "Unknown environment."),
