@@ -20,6 +20,8 @@ namespace GraphQLClient.Commands
 
         public static GQLRequest Instance => _instance.Value;
 
+        public static string Region { get; set; } = "US";
+
         public override async Task<T> QueryAsync<T>(string query, object? variables = null, CancellationToken cancellationToken = default)
         {
             var token = await TokenService.RequestTokenAsync(cancellationToken).ConfigureAwait(false);
@@ -43,7 +45,7 @@ namespace GraphQLClient.Commands
                 {
                     { "Authorization", $"Bearer {token.AccessToken}" },
                     { "Accept", "application/json"},
-                    { "Region", "US" }
+                    { "Region", Region }
                 }
             };
 

@@ -32,6 +32,8 @@ namespace GraphQLClient.Views
 #endif
                 EnvironmentComboBox.ItemsSource = envs;
 
+                _currentOAuthType = OAuthType.OAuth_PKCE;
+
                 SetClientConfiguration(_currentEnv);
                 GQLRequest.Environment = _currentEnv;
             };
@@ -85,37 +87,37 @@ namespace GraphQLClient.Views
         {
             if (_currentOAuthType == OAuthType.OAuth)
             {
-                ClientIdTextBox.Text = currentEnv switch
-                {
-                    GraphQLEnvironment.Staging => ConfigurationStg.Default.ClientID,
-                    GraphQLEnvironment.Production => Configuration.Default.ClientID,
-                    _ => ""
-                };
-                CallbackUrlTextBox.Text = currentEnv switch
-                {
-                    GraphQLEnvironment.Staging => ConfigurationStg.Default.CallbackURL,
-                    GraphQLEnvironment.Production => Configuration.Default.CallbackURL,
-                    _ => ""
-                };
-                ClientSecretTextBox.Password = currentEnv switch
-                {
-                    GraphQLEnvironment.Staging => ConfigurationStg.Default.ClientSecret,
-                    GraphQLEnvironment.Production => Configuration.Default.ClientSecret,
-                    _ => ""
-                };
+                //ClientIdTextBox.Text = currentEnv switch
+                //{
+                //    GraphQLEnvironment.Staging => ConfigurationStg.Default.ClientID,
+                //    GraphQLEnvironment.Production => Configuration.Default.ClientID,
+                //    _ => ""
+                //};
+                //CallbackUrlTextBox.Text = currentEnv switch
+                //{
+                //    GraphQLEnvironment.Staging => ConfigurationStg.Default.CallbackURL,
+                //    GraphQLEnvironment.Production => Configuration.Default.CallbackURL,
+                //    _ => ""
+                //};
+                //ClientSecretTextBox.Password = currentEnv switch
+                //{
+                //    GraphQLEnvironment.Staging => ConfigurationStg.Default.ClientSecret,
+                //    GraphQLEnvironment.Production => Configuration.Default.ClientSecret,
+                //    _ => ""
+                //};
             }
             else
             {
                 ClientIdPKCETextBox.Text = currentEnv switch
                 {
-                    GraphQLEnvironment.Staging => ConfigurationStg.Default.ClientID_PKCE,
-                    GraphQLEnvironment.Production => Configuration.Default.ClientID_PKCE,
+                    GraphQLEnvironment.Staging => "A74ztMCm6dFTk3tgtAR8IVbLLU7QsIqGHY6gnKb6WkWRvNdl",//ConfigurationStg.Default.ClientID_PKCE,
+                    GraphQLEnvironment.Production => "AoGLYso4FxislAIs7NOI5G0G6xOAuQhDBZOKDVSSccmvKnbF",//Configuration.Default.ClientID_PKCE,
                     _ => ""
                 };
                 CallbackPKCEUrlTextBox.Text = currentEnv switch
                 {
-                    GraphQLEnvironment.Staging => ConfigurationStg.Default.CallbackURL_PKCE,
-                    GraphQLEnvironment.Production => Configuration.Default.CallbackURL_PKCE,
+                    GraphQLEnvironment.Staging => "http://localhost:8080/oauth/callback",//ConfigurationStg.Default.CallbackURL_PKCE,
+                    GraphQLEnvironment.Production => "http://localhost:8080/oauth/callback",//Configuration.Default.CallbackURL_PKCE,
                     _ => ""
                 };
             }
@@ -126,9 +128,9 @@ namespace GraphQLClient.Views
             dynamic config = currentEnv == GraphQLEnvironment.Staging ? ConfigurationStg.Default : Configuration.Default;
             if (_currentOAuthType == OAuthType.OAuth)
             {
-                config.ClientID = ClientIdTextBox.Text;
-                config.ClientSecret = ClientSecretTextBox.Password;
-                config.CallbackURL = CallbackUrlTextBox.Text;
+                //config.ClientID = ClientIdTextBox.Text;
+                //config.ClientSecret = ClientSecretTextBox.Password;
+                //config.CallbackURL = CallbackUrlTextBox.Text;
             }
             else
             {

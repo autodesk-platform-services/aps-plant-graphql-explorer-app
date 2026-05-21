@@ -21,7 +21,7 @@ namespace GraphQLClient.Views
             InitializeComponent();
             DataContext = this;
         }
-
+        private bool _isLoading;
         public override ViewTypes ViewType => ViewTypes.Hubs;
         public override Task LoadData() => LoadHubsAsync();
         public override Task FreshView() => LoadHubsAsync();
@@ -46,10 +46,21 @@ namespace GraphQLClient.Views
             }
         }
 
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged();
+            }
+        }
+
         private async Task LoadHubsAsync()
         {
             try
             {
+                IsLoading = true;
                 var response = await GQLRequest.Instance.QueryAsync<GraphQLResponse<HubsData>>(QueryCommands.Query_Hubs);
 
                 if (response?.Data?.Hubs?.Results != null)
@@ -65,6 +76,10 @@ namespace GraphQLClient.Views
             {
                 // Handle error - could show in UI
                 MessageBox.Show($"Error loading hubs: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 

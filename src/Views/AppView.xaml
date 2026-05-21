@@ -51,6 +51,24 @@
                 </Button.Style>
             </Button>
 
+            <ComboBox x:Name="GraphQLRegionCombobox"
+                      Width="120"
+                      DockPanel.Dock="Right"
+                      Margin="0,0,12,0"
+                      SelectedIndex="0"
+                      SelectionChanged="GraphQLRegionCombobox_SelectionChanged">
+                <ComboBox.Style>
+                    <Style TargetType="ComboBox">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ViewType}" Value="{x:Static v:ViewTypes.Hubs}">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ComboBox.Style>
+            </ComboBox>
+
             <Grid />
         </DockPanel>
 
