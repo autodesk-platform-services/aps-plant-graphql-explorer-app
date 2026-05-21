@@ -6,11 +6,8 @@
              xmlns:local="clr-namespace:GraphQLClient.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <local:BaseView.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-    </local:BaseView.Resources>
     <Grid>
-        <TreeView x:Name="folders" 
+        <TreeView x:Name="folders"
                   ItemsSource="{Binding Folders}"
                   MouseDoubleClick="folders_MouseDoubleClick">
             <TreeView.ItemTemplate>
@@ -41,26 +38,6 @@
             </TreeView.ItemTemplate>
         </TreeView>
 
-        <Border Grid.RowSpan="2"
-                Background="#99000000"
-                Height="50"
-                Width="200"
-                Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
-                IsHitTestVisible="True">
-            <StackPanel HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Width="220"
-                        Background="#CCFFFFFF">
-                <StackPanel.Effect>
-                    <DropShadowEffect BlurRadius="12"
-                                      ShadowDepth="4"
-                                      Opacity="0.35" />
-                </StackPanel.Effect>
-                <ProgressBar IsIndeterminate="True" Height="6" Margin="0,0,0,12" />
-                <TextBlock Text="Loading results..."
-                           HorizontalAlignment="Center"
-                           FontWeight="SemiBold"/>
-            </StackPanel>
-        </Border>
+        <local:LoadingOverlay IsLoading="{Binding IsLoading}" />
     </Grid>
 </local:BaseView>

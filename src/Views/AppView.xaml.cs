@@ -23,6 +23,8 @@ namespace GraphQLClient.Views
         {
             GQLRequest.TokenService = tokenService;
             InitializeComponent();
+
+            GraphQLRegionCombobox.ItemsSource = new List<string> { "US", "EMEA", "APAC" };
         }
 
         public void SetView(BaseView view)
@@ -49,6 +51,12 @@ namespace GraphQLClient.Views
         private void nextButton_Click(object sender, RoutedEventArgs e)
         {
             _currentFreshView.NextButtonAcion();
+        }
+
+        private void GraphQLRegionCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            GQLRequest.Region = (string)GraphQLRegionCombobox.SelectedItem ?? "US";
+            _currentFreshView?.FreshView();
         }
     }
 }

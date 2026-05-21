@@ -7,7 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="680">
     <local:BaseView.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <SolidColorBrush x:Key="SearchResultsHeaderBackgroundBrush" Color="#EDF3FF" />
         <SolidColorBrush x:Key="SearchResultsHeaderBorderBrush" Color="#C6D4F2" />
         <SolidColorBrush x:Key="SearchResultsRowHoverBrush" Color="#EEF3FF" />
@@ -283,27 +282,7 @@
                               ColumnHeaderStyle="{StaticResource SearchResultsColumnHeaderStyle}" />
                     </Border>
 
-                    <Border Grid.Row="1"
-                            Background="#99000000"
-                            Height="50"
-                            Width="200"
-                            Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
-                            IsHitTestVisible="True">
-                        <StackPanel HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Width="220"
-                            Background="#CCFFFFFF">
-                            <StackPanel.Effect>
-                                <DropShadowEffect BlurRadius="12"
-                                          ShadowDepth="4"
-                                          Opacity="0.35" />
-                            </StackPanel.Effect>
-                            <ProgressBar IsIndeterminate="True" Height="6" Margin="0,0,0,12" />
-                            <TextBlock Text="Loading results..."
-                               HorizontalAlignment="Center"
-                               FontWeight="SemiBold"/>
-                        </StackPanel>
-                    </Border>
+                    <local:LoadingOverlay Grid.Row="1" IsLoading="{Binding IsLoading}" />
                 </Grid>
             </Grid>
         </Grid>
