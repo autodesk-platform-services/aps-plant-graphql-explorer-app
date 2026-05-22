@@ -24,7 +24,7 @@ namespace GraphQLClient.Views
             GQLRequest.TokenService = tokenService;
             InitializeComponent();
 
-            GraphQLRegionCombobox.ItemsSource = new List<string> { "US", "EMEA", "APAC" };
+            GraphQLRegionCombobox.ItemsSource = new List<string> { "US", "EMEA", "AUS" };
         }
 
         public void SetView(BaseView view)
