@@ -36,7 +36,8 @@ namespace GraphQLClient.Commands
                 Headers =
                 {
                     { "Authorization", $"Bearer {token.AccessToken}" },
-                    { "Accept", "application/json"}
+                    { "Accept", "application/json"},
+                    { "Regioni", GQLRequest.Region }
                 }
             };
 
