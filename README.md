@@ -1,81 +1,68 @@
-# Plant 3D AEC Data Model Explorer
+﻿# Plant 3D AEC Data Model Explorer
 
-This repository helps you set up **Plant 3D AEC Data Model (AECDM) Explorer** OAuth credentials and use them to obtain access tokens for Autodesk Platform Services (APS) APIs.
+A small tool to obtain OAuth tokens and run GraphQL queries against the Plant 3D AEC Data Model (AECDM) via Autodesk Platform Services (APS).
 
 ---
 
-## Table of Contents
+## Table of contents
 
+- [Overview](#overview)
 - [Prerequisites](#prerequisites)
-- [Step 1 — Create APS App Credentials](#step-1--create-aps-app-credentials)
-- [Step 2 — Configure This Tool](#step-2--configure-this-tool)
-- [Step 3 — Use This Tool](#step-3--use-this-tool)
+- [Quick start](#quick-start)
+- [Configuration — Client IDs](#client-ids)
+- [Using the tool](#using-the-tool)
+  - [Login](#login)
+  - [Accounts](#accounts)
+  - [Region](#region)
+  - [Plant Collaboration Projects](#plant-collaboration-projects)
+  - [Query view](#query-view)
+    - [Scope](#scope)
+    - [P3D References](#p3d-references)
+    - [Query input](#query-input)
+    - [Export CSV](#export-csv)
+- [Troubleshooting](#troubleshooting)
+- [Links](#links)
+- [Contributing](#contributing)
+
+---
+
+## Overview
+
+This repository provides a small desktop explorer that helps you:
+- Authenticate with Autodesk,
+- Browse accessible Accounts and Plant Collaboration Projects,
+- Run GraphQL queries against AECDM and export results to CSV.
 
 ---
 
 ## Prerequisites
 
-- An Autodesk Platform Services (APS) account
-- Access to the APS Developer Portal
-- ACC/Docs access
-- Knowledge of GraphQL syntax
+- Autodesk Construction Cloud / Docs access with appropriate permissions.
+- Familiarity with GraphQL query syntax.
+- A registered APS Integration (to get a Client ID for OAuth).
 
 ---
 
-## Step 1 — Create APS App Credentials
+## Quick start
 
-To use APS APIs, you must create an application and obtain OAuth credentials.
-
-1. Sign in to the [**APS Developer Portal**](https://aps.autodesk.com)
-2. Open **Applications** from your profile menu
-3. Click **Create application**
-4. Enter an application name and select the appropriate application type (for example, **Web App**)
-5. After creation, copy:
-   - **Client ID**
-   - **Client Secret** (confidential clients only)
-6. Configure the **Callback URL**, for example:
-
-   ```
-   http://localhost:8080/api/auth/callback
-   ```
-
-   > The callback URL **must exactly match** what your application/tool uses.
-
-7. Enable the APIs required by your use case. Make sure you include:
-   - **AEC Data Model API**
-   - **Autodesk Construction Cloud API**
-8. Click **Save changes**
+1. Add the integration Client ID into the application configuration (see next section).
+2. Launch the app and click **Sign in with Autodesk**. Complete the OAuth flow.
+3. Browse Accounts → select a Hub/Region → double-click a Plant Collaboration Project to open the Query view.
 
 ---
 
-## Step 2 — Configure This Tool
+## Client IDs
 
-Your OAuth configuration depends on the application type you created.
-In this example, **Option A** is used.  
-**Option B** can also be used with this sample application, depending on the application type.
+Add the Client ID from your registered integration into the app's custom integration configuration. Example IDs used for this tool:
 
-### Option A — OAuth (Client Secret)
-
-Use this for confidential clients (for example, server-side web apps).
-
-```text
-Client ID      = "your_client_id"
-Client Secret  = "your_client_secret"
-Callback URL   = "http://localhost:8080/api/auth/callback"  # must match Step 1
 ```
-
-### Option B — OAuth with PKCE (No Client Secret)
-
-Use this for public clients (for example, desktop or SPA apps) using PKCE.
-
-```text
-Client ID    = "your_client_id"
-Callback URL = "http://localhost:8080/api/auth/callback"  # must match Step 1
+Staging		=>	"A74ztMCm6dFTk3tgtAR8IVbLLU7QsIqGHY6gnKb6WkWRvNdl"
+Production	=>	"AoGLYso4FxislAIs7NOI5G0G6xOAuQhDBZOKDVSSccmvKnbF"
 ```
 
 ---
 
-## Step 3 — Use This Tool
+## Using the tool
 
 ### Login
 
@@ -85,6 +72,10 @@ After you complete the OAuth configuration, click **Sign in with Autodesk** and 
 
 After login, the first view lists all **Accounts** the current user can access. Double-click an account to view its Plant Collaboration Projects.
 
+### Region
+
+Now you can select the region on the Hubs view to indicate which region you'd like to working on.
+
 ### Plant Collaboration Projects
 
 Items with the Plant icon are Plant Collaboration Projects.
@@ -92,7 +83,7 @@ Items with the Plant icon are Plant Collaboration Projects.
 - **Black icon**: The project supports AECDM
 - **Red icon**: The project does not support AECDM, or the project is broken
 
-### Query
+### Query view
 
 When you double-click a supported Plant Collaboration Project, you’ll see a query view where you can query data from AECDM.
 
@@ -113,7 +104,7 @@ The dropdown contains three sections:
 
 > Double-click an item to automatically insert its query snippet into the query input.
 
-#### Query Input
+#### Query input
 
 Enter your GraphQL query here. For filtering guidance, see:
 - https://aps.autodesk.com/en/docs/aecdatamodel/v1/developers_guide/filtering/
@@ -121,3 +112,19 @@ Enter your GraphQL query here. For filtering guidance, see:
 #### Export CSV
 
 Export the query results to CSV for downstream use.
+
+---
+
+## Troubleshooting
+
+- **Network issues**: Check internet connectivity and any firewall or proxy settings that might block the app.
+
+---
+
+## Links
+
+- [APS Documentation](https://aps.autodesk.com/en/docs)
+- [GraphQL Documentation](https://graphql.org/learn/)
+- [AEC Data Model Documentation](https://aps.autodesk.com/en/docs/aecdatamodel/v1/overview/)
+
+---
