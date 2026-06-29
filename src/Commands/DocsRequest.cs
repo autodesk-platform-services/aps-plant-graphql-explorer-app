@@ -24,7 +24,7 @@ namespace GraphQLClient.Commands
             var token = await TokenService.RequestTokenAsync(cancellationToken).ConfigureAwait(false);
 
             var baseUrl = string.Format(BaseUrl, projectId, folderUrn);
-            using var message = new HttpRequestMessage(HttpMethod.Get, baseUrl + "/contents?filter[displayName]=PipingPart.xml")
+            using var message = new HttpRequestMessage(HttpMethod.Get, baseUrl + "/contents?filter[displayName]=Project.xml")
             {
                 Headers =
                 {
@@ -59,7 +59,7 @@ namespace GraphQLClient.Commands
                 if (!attrs.TryGetProperty("displayName", out var nameProp)) continue;
 
                 var displayName = nameProp.GetString();
-                if (string.Equals(displayName, "PipingPart.xml", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(displayName, "Project.xml", StringComparison.OrdinalIgnoreCase))
                 {
                     var id = item.TryGetProperty("id", out var idProp) ? idProp.GetString() : null;
                     return true;
