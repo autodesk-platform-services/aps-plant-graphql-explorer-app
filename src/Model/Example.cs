@@ -14,5 +14,6 @@ namespace GraphQLClient.Data
         public string Title { get; set; }
         public string Scope { get; set; }
         public string Script { get; set; }
+        public string Project { get; set; }
     }
 }

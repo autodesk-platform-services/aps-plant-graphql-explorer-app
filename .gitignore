@@ -179,5 +179,14 @@ project.lock.json
 # publish folder
 output/
 
-# database 
+# database
 *.jfm
+
+# scratch notes — never commit (project ids, hub ids, working queries)
+notes/
+
+# local Claude Code session note, not repo content
+resume.txt
+
+# raw demo recording — upload via GitHub's web UI to get a hosted asset URL instead
+Working-Demo.mp4

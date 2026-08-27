@@ -154,6 +154,21 @@
                             <EventSetter Event="MouseDoubleClick" Handler="SchemaList_MouseDoubleClick"/>
                         </Style>
                     </ListBox.ItemContainerStyle>
+                    <ListBox.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}"
+                                               FontWeight="Bold"
+                                               FontSize="11"
+                                               Foreground="#1F2937"
+                                               Background="#EDF3FF"
+                                               Padding="6,3"
+                                               Margin="0,4,0,2"/>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ListBox.GroupStyle>
                 </ListBox>
             </Grid>
 

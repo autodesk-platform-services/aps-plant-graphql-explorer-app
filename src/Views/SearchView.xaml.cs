@@ -334,6 +334,14 @@ namespace GraphQLClient.Views
                     resultsDataGrid.ItemsSource = table.DefaultView;
                 });
 
+                if (table.Rows.Count == 0)
+                {
+                    MessageBox.Show(
+                        "No elements matched this query. The project may not have data meeting these filter conditions, or the tag/value doesn't exist in this project's scope.",
+                        "No results",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
             }
             catch (Exception ex)
             {
@@ -687,10 +695,21 @@ namespace GraphQLClient.Views
             {
                 case 0: // Examples
                     {
-                        var data = _examplesObject.Examples.ToDictionary(k => k.Title, v => (v.Script, v.Scope)).ToList();
-                        if (data != null && data.Count > 0)
+                        var data = _examplesObject.Examples
+                            .Select(v => new
+                            {
+                                Key = v.Title,
+                                Value = (v.Script, v.Scope),
+                                Project = string.IsNullOrWhiteSpace(v.Project) ? "General (any project)" : v.Project
+                            })
+                            .ToList();
+
+                        if (data.Count > 0)
                         {
-                            schemaList.ItemsSource = data;
+                            var view = CollectionViewSource.GetDefaultView(data);
+                            view.GroupDescriptions.Clear();
+                            view.GroupDescriptions.Add(new PropertyGroupDescription("Project"));
+                            schemaList.ItemsSource = view;
                         }
                     }
                     break;

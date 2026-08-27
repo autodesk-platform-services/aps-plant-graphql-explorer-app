@@ -3,42 +3,110 @@
     {
       "Title": "Query valves in project (P&ID)",
       "Scope": "PID",
-      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains=HandValves"
+      "Project": "General (any project)",
+      "Script": "property.id.autodesk.plant3d.parameter:tableNames-1.0.0=contains='HandValves'"
     },
     {
       "Title": "Query valves in project (3D)",
       "Scope": "P3D",
-      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains=Valve"
-    },
-    {
-      "Title": "Query valves per DWG (P&ID)",
-      "Scope": "PID",
-      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains='HandValves' and property.id.autodesk.plant3d.parameter:dwgId-1.0.0 == 1275"
-    },
-    {
-      "Title": "Query valves per DWG (3D)",
-      "Scope": "P3D",
-      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains='Valve' and property.id.autodesk.plant3d.parameter:dwgId-1.0.0 == 4346"
+      "Project": "General (any project)",
+      "Script": "property.id.autodesk.plant3d.parameter:tableNames-1.0.0=contains='Valve'"
     },
     {
       "Title": "Query equipment in project (P&ID)",
       "Scope": "PID",
-      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains=Equipment"
+      "Project": "General (any project)",
+      "Script": "property.id.autodesk.plant3d.parameter:tableNames-1.0.0=contains='Equipment'"
     },
     {
       "Title": "Query equipment in project (3D)",
       "Scope": "P3D",
-      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains=Equipment"
+      "Project": "General (any project)",
+      "Script": "property.id.autodesk.plant3d.parameter:tableNames-1.0.0=contains='Equipment'"
     },
     {
-      "Title": "Query line numbers in project (P&ID)",
+      "Title": "Query drawings in project (P&ID)",
       "Scope": "PID",
-      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains='Primary' and property.id.autodesk.plant3d.parameter:tag-1.0.0=contains='4\"-CS300-P-'"
+      "Project": "General (any project)",
+      "Script": "property.id.autodesk.plant3d.parameter:tableNames-1.0.0=contains='pnpdrawings'"
     },
     {
-      "Title": "Query line numbers in project (3D)",
+      "Title": "Query relationship rows: LineInlineAsset (P&ID)",
+      "Scope": "PID",
+      "Project": "General (any project)",
+      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains='LineInlineAsset'"
+    },
+    {
+      "Title": "Query valves per DWG, stage 2 of 3 (P&ID)",
+      "Scope": "PID",
+      "Project": "General (any project) — requires a real dwgId",
+      "Script": "property.id.autodesk.plant3d.parameter:tableNames-1.0.0=contains='PnPDataLinks' and property.id.autodesk.plant3d.parameter:dwgId-1.0.0==1275 and property.id.autodesk.plant3d.parameter:rowClassName-1.0.0=='GateValve'"
+    },
+    {
+      "Title": "Query line numbers by spec prefix (P&ID)",
+      "Scope": "PID",
+      "Project": "General (any project) — edit the spec prefix",
+      "Script": "property.id.autodesk.plant3d.parameter:tableNames-1.0.0=contains='Primary' and property.id.autodesk.plant3d.parameter:tag-1.0.0=contains='4\"-CS300-P-'"
+    },
+    {
+      "Title": "Query a custom property (edit hubId + property id)",
+      "Scope": "PID",
+      "Project": "General (any project) — requires exact custom property id",
+      "Script": "property.id.parameters.YOUR_HUB_ID:yourpropertyname_double-1.0.0=='value'"
+    },
+    {
+      "Title": "Query pipes by line number (3D)",
       "Scope": "P3D",
-      "Script": "property.id.autodesk.plant3d.parameter:pnpClassName-1.0.0=contains='Pipe' and property.id.autodesk.plant3d.parameter:lineNumberTag-1.0.0=contains='1009'"
+      "Project": "General (any project) — edit the line number",
+      "Script": "property.id.autodesk.plant3d.parameter:tableNames-1.0.0=contains='Pipe,' and property.id.autodesk.plant3d.parameter:lineNumberTag-1.0.0=contains='1009'"
+    },
+    {
+      "Title": "Query pumps P-407A/B by tag (P&ID)",
+      "Scope": "PID",
+      "Project": "VesselTransferUnit_AECDM (demo project only)",
+      "Script": "property.id.autodesk.plant3d.parameter:tag-1.0.0=contains='P-407'"
+    },
+    {
+      "Title": "Query vessel V-407 by tag (P&ID)",
+      "Scope": "PID",
+      "Project": "VesselTransferUnit_AECDM (demo project only)",
+      "Script": "property.id.autodesk.plant3d.parameter:tag-1.0.0=contains='V-407'"
+    },
+    {
+      "Title": "Query nozzle N-407 by tag (P&ID)",
+      "Scope": "PID",
+      "Project": "VesselTransferUnit_AECDM (demo project only)",
+      "Script": "property.id.autodesk.plant3d.parameter:tag-1.0.0=contains='N-407'"
+    },
+    {
+      "Title": "Query hand valve HA-166 by type + tag (P&ID)",
+      "Scope": "PID",
+      "Project": "VesselTransferUnit_AECDM (demo project only)",
+      "Script": "property.id.autodesk.plant3d.parameter:tableNames-1.0.0=contains='HandValves' and property.id.autodesk.plant3d.parameter:tag-1.0.0=contains='HA-166'"
+    },
+    {
+      "Title": "Query CS300 spec piping by tag (P&ID)",
+      "Scope": "PID",
+      "Project": "VesselTransferUnit_AECDM (demo project only)",
+      "Script": "property.id.autodesk.plant3d.parameter:tag-1.0.0=contains='CS300'"
+    },
+    {
+      "Title": "Query tank TK-407 by tag (3D)",
+      "Scope": "P3D",
+      "Project": "VesselTransferUnit_AECDM (demo project only)",
+      "Script": "property.id.autodesk.plant3d.parameter:tag-1.0.0=contains='TK-407'"
+    },
+    {
+      "Title": "Query pumps P-407A/B by tag (3D)",
+      "Scope": "P3D",
+      "Project": "VesselTransferUnit_AECDM (demo project only)",
+      "Script": "property.id.autodesk.plant3d.parameter:tag-1.0.0=contains='P-407'"
+    },
+    {
+      "Title": "Query vessel V-407 by tag (3D)",
+      "Scope": "P3D",
+      "Project": "VesselTransferUnit_AECDM (demo project only)",
+      "Script": "property.id.autodesk.plant3d.parameter:tag-1.0.0=contains='V-407'"
     }
   ]
 }

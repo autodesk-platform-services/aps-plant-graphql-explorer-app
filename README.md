@@ -23,6 +23,7 @@ A small tool to obtain OAuth tokens and run GraphQL queries against the Plant 3D
 - [Troubleshooting](#troubleshooting)
 - [Links](#links)
 - [Contributing](#contributing)
+- [Authors](#authors)
 
 ---
 
@@ -32,6 +33,14 @@ This repository provides a small desktop explorer that helps you:
 - Authenticate with Autodesk,
 - Browse accessible Accounts and Plant Collaboration Projects,
 - Run GraphQL queries against AECDM and export results to CSV.
+
+![Query view running a P&ID filter query against a real Plant 3D project](docs/images/working-demo.png)
+
+<!-- TODO: demo video — drag & drop the recording into a GitHub PR/issue comment on
+     autodesk-platform-services/aps-plant-graphql-explorer-app to get an asset URL,
+     then replace this comment with:
+     https://github.com/user-attachments/assets/<id>
+-->
 
 ---
 
@@ -52,6 +61,10 @@ This repository provides a small desktop explorer that helps you:
 ---
 
 ## Client IDs
+
+This app is a desktop client and authenticates using **PKCE** (no client secret). When registering your integration at https://aps.autodesk.com, make sure to create it as a **Desktop, Mobile, Single-Page App** — not a Traditional Web App or Server-to-Server App:
+
+![Create a PKCE-capable app: choose "Desktop, Mobile, Single-Page App"](docs/images/public-app-type.png)
 
 Add the Client ID from your registered integration into the app's custom integration configuration. Example IDs used for this tool:
 
@@ -126,5 +139,13 @@ Export the query results to CSV for downstream use.
 - [APS Documentation](https://aps.autodesk.com/en/docs)
 - [GraphQL Documentation](https://graphql.org/learn/)
 - [AEC Data Model Documentation](https://aps.autodesk.com/en/docs/aecdatamodel/v1/overview/)
+- [AEC Data Model Tutorials — Before You Begin](https://aps.autodesk.com/en/docs/aecdatamodel/v1/tutorials/before_you_begin/)
+
+---
+
+## Authors
+
+- Developed by Yuan Gu (Plant Engineering Team)
+- Maintained by Madhukar Moogala (APS Team)
 
 ---
