@@ -126,6 +126,12 @@ Enter your GraphQL query here. For filtering guidance, see:
 
 Export the query results to CSV for downstream use.
 
+#### Demo
+
+
+https://github.com/user-attachments/assets/305ae23f-8285-48e4-bdbc-ae697d60eb13
+
+
 ---
 
 ## Troubleshooting
