@@ -23,6 +23,7 @@ A small tool to obtain OAuth tokens and run GraphQL queries against the Plant 3D
 - [Troubleshooting](#troubleshooting)
 - [Links](#links)
 - [Contributing](#contributing)
+- [License](#license)
 - [Authors](#authors)
 
 ---
@@ -140,6 +141,12 @@ Export the query results to CSV for downstream use.
 - [GraphQL Documentation](https://graphql.org/learn/)
 - [AEC Data Model Documentation](https://aps.autodesk.com/en/docs/aecdatamodel/v1/overview/)
 - [AEC Data Model Tutorials — Before You Begin](https://aps.autodesk.com/en/docs/aecdatamodel/v1/tutorials/before_you_begin/)
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
 
 ---
 
