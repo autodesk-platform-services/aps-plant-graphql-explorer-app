@@ -37,12 +37,6 @@ This repository provides a small desktop explorer that helps you:
 
 ![Query view running a P&ID filter query against a real Plant 3D project](docs/images/working-demo.png)
 
-<!-- TODO: demo video — drag & drop the recording into a GitHub PR/issue comment on
-     autodesk-platform-services/aps-plant-graphql-explorer-app to get an asset URL,
-     then replace this comment with:
-     https://github.com/user-attachments/assets/<id>
--->
-
 ---
 
 ## Prerequisites
