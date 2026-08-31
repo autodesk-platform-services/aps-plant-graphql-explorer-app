@@ -12,8 +12,7 @@ namespace GraphQLClient.Commands
         private static readonly Lazy<DMRequest> _instance = new(() => new DMRequest());
 
         private DMRequest()
-            : base("https://developer-stg.api.autodesk.com/dm/v3/projects/{0}/entities:search",
-                   "https://developer.api.autodesk.com/dm/v3/projects/{0}/entities:search")
+            : base("https://developer.api.autodesk.com/dm/v3/projects/{0}/entities:search")
         {
         }
 

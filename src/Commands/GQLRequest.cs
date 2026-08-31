@@ -14,7 +14,7 @@ namespace GraphQLClient.Commands
         private static readonly Lazy<GQLRequest> _instance = new(() => new GQLRequest());
 
         private GQLRequest()
-            : base("https://developer-stg.api.autodesk.com/aec/graphql", "https://developer.api.autodesk.com/aec/graphql")
+            : base("https://developer.api.autodesk.com/aec/graphql")
         {
         }
 

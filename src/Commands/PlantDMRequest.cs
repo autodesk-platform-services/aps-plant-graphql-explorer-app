@@ -10,9 +10,8 @@ namespace GraphQLClient.Commands
     {
         private static readonly Lazy<PlantDMRequest> _instance = new(() => new PlantDMRequest());
 
-        public PlantDMRequest() : 
-            base("https://developer-stg.api.autodesk.com/plant/v3/datamodel/project/{0}/folderUrn/{1}/searchFilePlus",
-                 "https://developer.api.autodesk.com/plant/v3/datamodel/project/{0}/folderUrn/{1}/searchFilePlus")
+        public PlantDMRequest() :
+            base("https://developer.api.autodesk.com/plant/v3/datamodel/project/{0}/folderUrn/{1}/searchFilePlus")
         {
         }
 

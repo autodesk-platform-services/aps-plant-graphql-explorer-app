@@ -8,16 +8,14 @@ namespace GraphQLClient.Commands
     {
         protected readonly HttpClient httpClient = CreateHttpClient();
 
-        protected string StagingUrl { get; }
         protected string ProductionUrl { get; }
 
         public static OAuthPasswordTokenService TokenService { get; set; }
 
-        public static GraphQLEnvironment Environment { get; set; } = GraphQLEnvironment.Staging;
+        public static GraphQLEnvironment Environment { get; set; } = GraphQLEnvironment.Production;
 
-        public Request(string stagingUrl, string productionUrl)
+        public Request(string productionUrl)
         {
-            StagingUrl = stagingUrl;
             ProductionUrl = productionUrl;
         }
 
@@ -26,7 +24,7 @@ namespace GraphQLClient.Commands
             throw new NotImplementedException("This method should be implemented in a derived class.");
         }
 
-        public string BaseUrl => Environment == GraphQLEnvironment.Staging ? StagingUrl : ProductionUrl;
+        public string BaseUrl => ProductionUrl;
 
         private static HttpClient CreateHttpClient()
         {

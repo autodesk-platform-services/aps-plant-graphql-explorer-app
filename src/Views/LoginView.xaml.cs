@@ -24,12 +24,7 @@ namespace GraphQLClient.Views
             Loaded += delegate
             {
                 var envs = new List<GraphQLEnvironment> { GraphQLEnvironment.Production };
-#if DEBUG
-                envs.Insert(0, GraphQLEnvironment.Staging);
-                _currentEnv = GraphQLEnvironment.Staging;
-#else
                 _currentEnv = GraphQLEnvironment.Production;
-#endif
                 EnvironmentComboBox.ItemsSource = envs;
 
                 _currentOAuthType = OAuthType.OAuth_PKCE;
@@ -73,7 +68,7 @@ namespace GraphQLClient.Views
         {
             if (EnvironmentComboBox.SelectedItem != null)
             {
-                _currentEnv = Enum.TryParse<GraphQLEnvironment>(EnvironmentComboBox.SelectedItem.ToString(), out var env) ? env : GraphQLEnvironment.Staging;
+                _currentEnv = Enum.TryParse<GraphQLEnvironment>(EnvironmentComboBox.SelectedItem.ToString(), out var env) ? env : GraphQLEnvironment.Production;
                 Request.Environment = _currentEnv;
 
                 if (ConfigBorder != null)
@@ -89,43 +84,30 @@ namespace GraphQLClient.Views
             {
                 //ClientIdTextBox.Text = currentEnv switch
                 //{
-                //    GraphQLEnvironment.Staging => ConfigurationStg.Default.ClientID,
                 //    GraphQLEnvironment.Production => Configuration.Default.ClientID,
                 //    _ => ""
                 //};
                 //CallbackUrlTextBox.Text = currentEnv switch
                 //{
-                //    GraphQLEnvironment.Staging => ConfigurationStg.Default.CallbackURL,
                 //    GraphQLEnvironment.Production => Configuration.Default.CallbackURL,
                 //    _ => ""
                 //};
                 //ClientSecretTextBox.Password = currentEnv switch
                 //{
-                //    GraphQLEnvironment.Staging => ConfigurationStg.Default.ClientSecret,
                 //    GraphQLEnvironment.Production => Configuration.Default.ClientSecret,
                 //    _ => ""
                 //};
             }
             else
             {
-                ClientIdPKCETextBox.Text = currentEnv switch
-                {
-                    GraphQLEnvironment.Staging => "A74ztMCm6dFTk3tgtAR8IVbLLU7QsIqGHY6gnKb6WkWRvNdl",//ConfigurationStg.Default.ClientID_PKCE,
-                    GraphQLEnvironment.Production => "AoGLYso4FxislAIs7NOI5G0G6xOAuQhDBZOKDVSSccmvKnbF",//Configuration.Default.ClientID_PKCE,
-                    _ => ""
-                };
-                CallbackPKCEUrlTextBox.Text = currentEnv switch
-                {
-                    GraphQLEnvironment.Staging => "http://localhost:8080/oauth/callback",//ConfigurationStg.Default.CallbackURL_PKCE,
-                    GraphQLEnvironment.Production => "http://localhost:8080/oauth/callback",//Configuration.Default.CallbackURL_PKCE,
-                    _ => ""
-                };
+                ClientIdPKCETextBox.Text = Configuration.Default.ClientID_PKCE;
+                CallbackPKCEUrlTextBox.Text = Configuration.Default.CallbackURL_PKCE;
             }
         }
 
         private void SaveClientConfiguration(GraphQLEnvironment currentEnv)
         {
-            dynamic config = currentEnv == GraphQLEnvironment.Staging ? ConfigurationStg.Default : Configuration.Default;
+            dynamic config = Configuration.Default;
             if (_currentOAuthType == OAuthType.OAuth)
             {
                 //config.ClientID = ClientIdTextBox.Text;

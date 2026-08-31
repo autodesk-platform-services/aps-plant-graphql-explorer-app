@@ -12,8 +12,7 @@ namespace GraphQLClient.Commands
         private static readonly Lazy<DocsRequest> _instance = new(() => new DocsRequest());
 
         private DocsRequest()
-            : base("https://developer-stg.api.autodesk.com/data/v1/projects/{0}/folders/{1}",
-                   "https://developer.api.autodesk.com/data/v1/projects/{0}/folders/{1}")
+            : base("https://developer.api.autodesk.com/data/v1/projects/{0}/folders/{1}")
         {
         }
 

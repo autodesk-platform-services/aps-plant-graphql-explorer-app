@@ -38,14 +38,6 @@ namespace GraphQLClient.Services
         {
             var defaults = environment switch
             {
-                GraphQLEnvironment.Staging => new
-                {
-                    Authorize = "https://developer-stg.api.autodesk.com/authentication/v2/authorize",
-                    Token = "https://developer-stg.api.autodesk.com/authentication/v2/token",
-                    ClientId = oAuthType == OAuthType.OAuth ? ConfigurationStg.Default.ClientID : ConfigurationStg.Default.ClientID_PKCE,
-                    ClientSecret = oAuthType == OAuthType.OAuth ? ConfigurationStg.Default.ClientSecret: null,
-                    Callback = oAuthType == OAuthType.OAuth ? ConfigurationStg.Default.CallbackURL : ConfigurationStg.Default.CallbackURL_PKCE
-                },
                 GraphQLEnvironment.Production => new
                 {
                     Authorize = "https://developer.api.autodesk.com/authentication/v2/authorize",
