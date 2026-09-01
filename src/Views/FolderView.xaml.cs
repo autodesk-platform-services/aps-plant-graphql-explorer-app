@@ -142,16 +142,16 @@ namespace GraphQLClient.Views
             var (pidfoldUrn, p3dfolderUrn) = await DocsRequest.Instance.FindFilePlusFoldersAsync(c.Id, _dmProjectId);
             //var pidUrn = await PlantDMRequest.Instance.GetFilePlusDataAsync(pidfoldUrn, _dmProjectId);
             //var p3dUrn = await PlantDMRequest.Instance.GetFilePlusDataAsync(p3dfolderUrn, _dmProjectId);
-            var folderUrns = await Task.WhenAll(
-                PlantDMRequest.Instance.GetFilePlusDataAsync(pidfoldUrn, _dmProjectId),
-                PlantDMRequest.Instance.GetFilePlusDataAsync(p3dfolderUrn, _dmProjectId)
-            );
+            //var folderUrns = await Task.WhenAll(
+            //    PlantDMRequest.Instance.GetFilePlusDataAsync(pidfoldUrn, _dmProjectId),
+            //    PlantDMRequest.Instance.GetFilePlusDataAsync(p3dfolderUrn, _dmProjectId)
+            //);
 
-            var (pidUrn, p3dUrn) = (folderUrns[0], folderUrns[1]);
-            if (string.IsNullOrEmpty(pidUrn) || string.IsNullOrEmpty(p3dUrn))
-            {
-                return;
-            }
+            //var (pidUrn, p3dUrn) = (folderUrns[0], folderUrns[1]);
+            //if (string.IsNullOrEmpty(pidUrn) || string.IsNullOrEmpty(p3dUrn))
+            //{
+            //    return;
+            //}
 
             var groups = await Task.WhenAll(GetGroupElement(pidfoldUrn), GetGroupElement(p3dfolderUrn));
             var (pidGroupId, p3dGroupId) = (groups[0], groups[1]);

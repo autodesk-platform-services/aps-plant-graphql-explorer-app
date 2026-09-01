@@ -57,16 +57,16 @@ This repository provides a small desktop explorer that helps you:
 
 ## Client IDs
 
-This app is a desktop client and authenticates using **PKCE** (no client secret). When registering your integration at https://aps.autodesk.com, make sure to create it as a **Desktop, Mobile, Single-Page App** — not a Traditional Web App or Server-to-Server App:
+This app is a desktop client and authenticates using both ***Traditional Web App*** and **PKCE** (no client secret). When registering your integration at https://aps.autodesk.com,
 
+Option 1:
+Create a web app and login with ***Client Id***, ***Password*** and ***Callback***.
+
+![Create a Web app: choose "Traditional Web App"](docs/images/public-app-type-web.png)
+
+Option 2:
+Create a PKCE-capable app
 ![Create a PKCE-capable app: choose "Desktop, Mobile, Single-Page App"](docs/images/public-app-type.png)
-
-Add the Client ID from your registered integration into the app's custom integration configuration. Example IDs used for this tool:
-
-```
-Staging		=>	"A74ztMCm6dFTk3tgtAR8IVbLLU7QsIqGHY6gnKb6WkWRvNdl"
-Production	=>	"AoGLYso4FxislAIs7NOI5G0G6xOAuQhDBZOKDVSSccmvKnbF"
-```
 
 ---
 
