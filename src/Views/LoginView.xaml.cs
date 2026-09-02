@@ -82,21 +82,21 @@ namespace GraphQLClient.Views
         {
             if (_currentOAuthType == OAuthType.OAuth)
             {
-                //ClientIdTextBox.Text = currentEnv switch
-                //{
-                //    GraphQLEnvironment.Production => Configuration.Default.ClientID,
-                //    _ => ""
-                //};
-                //CallbackUrlTextBox.Text = currentEnv switch
-                //{
-                //    GraphQLEnvironment.Production => Configuration.Default.CallbackURL,
-                //    _ => ""
-                //};
-                //ClientSecretTextBox.Password = currentEnv switch
-                //{
-                //    GraphQLEnvironment.Production => Configuration.Default.ClientSecret,
-                //    _ => ""
-                //};
+                ClientIdTextBox.Text = currentEnv switch
+                {
+                   GraphQLEnvironment.Production => Configuration.Default.ClientID,
+                   _ => ""
+                };
+                CallbackUrlTextBox.Text = currentEnv switch
+                {
+                   GraphQLEnvironment.Production => Configuration.Default.CallbackURL,
+                   _ => ""
+                };
+                ClientSecretTextBox.Password = currentEnv switch
+                {
+                   GraphQLEnvironment.Production => Configuration.Default.ClientSecret,
+                   _ => ""
+                };
             }
             else
             {
@@ -110,9 +110,9 @@ namespace GraphQLClient.Views
             dynamic config = Configuration.Default;
             if (_currentOAuthType == OAuthType.OAuth)
             {
-                //config.ClientID = ClientIdTextBox.Text;
-                //config.ClientSecret = ClientSecretTextBox.Password;
-                //config.CallbackURL = CallbackUrlTextBox.Text;
+                config.ClientID = ClientIdTextBox.Text;
+                config.ClientSecret = ClientSecretTextBox.Password;
+                config.CallbackURL = CallbackUrlTextBox.Text;
             }
             else
             {
